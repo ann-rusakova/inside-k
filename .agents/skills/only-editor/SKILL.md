@@ -10,6 +10,7 @@ description: >
   фразы», «поправь текст по редполитике». НЕ используй для оценки текста по шкале 0–10 с тегами
   замечаний по всему массиву (для этого full-analysis-text) и не используй для количественных
   анкет (survey) или гайдов интервью (design-guide).
+  English triggers: "rewrite UI text", "shorten a label", "make this text friendlier".
 ---
 
 # Точечная редактура интерфейсного текста
@@ -22,13 +23,13 @@ description: >
 1. Определи тип фрагмента: кнопка/CTA, заголовок, тост/хинт, подпись поля, подсказка-плейсхолдер,
    тело сообщения. От типа зависит, какие правила применимы (пунктуация в тостах ≠ пунктуация в теле).
 2. Проверь фрагмент по приоритетным источникам (полные тексты, самые частые нарушения):
-   - [`../../../references/redpolitika/screen-typography-rules.md`](../../../references/redpolitika/screen-typography-rules.md) — неразрывные пробелы, кавычки, тире/дефис/минус
-   - [`../../../references/redpolitika/disputed-words-rules.md`](../../../references/redpolitika/disputed-words-rules.md) — спорные слова и штампы
-   - [`../../../references/redpolitika/letters-rules.md`](../../../references/redpolitika/letters-rules.md) — регистр, капс, «вы»
-   - [`../../../references/redpolitika/numbers-currency-rules.md`](../../../references/redpolitika/numbers-currency-rules.md) — числа, даты, валюта
-   - [`../../../references/redpolitika/signs-rules.md`](../../../references/redpolitika/signs-rules.md) — знаки препинания и спецсимволы
+   - [`../../../references/editorial-policy/screen-typography-rules.md`](../../../references/editorial-policy/screen-typography-rules.md) — неразрывные пробелы, кавычки, тире/дефис/минус
+   - [`../../../references/editorial-policy/disputed-words-rules.md`](../../../references/editorial-policy/disputed-words-rules.md) — спорные слова и штампы
+   - [`../../../references/editorial-policy/letters-rules.md`](../../../references/editorial-policy/letters-rules.md) — регистр, капс, «вы»
+   - [`../../../references/editorial-policy/numbers-currency-rules.md`](../../../references/editorial-policy/numbers-currency-rules.md) — числа, даты, валюта
+   - [`../../../references/editorial-policy/signs-rules.md`](../../../references/editorial-policy/signs-rules.md) — знаки препинания и спецсимволы
 3. Дополнительно (только разделы, которых нет в источниках выше — «Под запретом», «Простой язык»,
-   «Словарь терминов») см. [`../../../references/redpolitika/svodnye-pravila-po-gruppam.md`](../../../references/redpolitika/svodnye-pravila-po-gruppam.md).
+   «Словарь терминов») см. [`../../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../../references/editorial-policy/svodnye-pravila-po-gruppam.md).
    Разделы «Типографика» и «Числа» там дублируют файлы выше — не пересказывай их дважды.
 4. Дай короткий список нарушений с точной цитатой фрагмента (а не общей формулировкой совета) —
    пользователю в интерфейсе плагина это подсвечивает проблемное место в тексте.
@@ -37,7 +38,7 @@ description: >
    - **Сократить** — та же мысль короче, без потери смысла
    - **Сделать четче** — убрать двусмысленность и общие слова, оставить конкретику
    - **Сделать дружелюбнее** — смягчить тон, не теряя конкретику (см. «Тон и голос» в сводке)
-   Если режим не указан явно — предложи 2–3 варианта в разных режимах и спроси, какой ближе.
+     Если режим не указан явно — предложи 2–3 варианта в разных режимах и спроси, какой ближе.
 
 ## Гоучи
 

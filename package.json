@@ -2,8 +2,16 @@
   "name": "inside-k",
   "version": "1.0.0",
   "private": true,
-  "description": "UX-исследования и редактура Контура: скиллы + Figma-плагин",
+  "description": "UX-исследования и редактура Контура: скиллы + Figma-плагины",
   "scripts": {
-    "build:simple-editor": "node plugins/simple-editor/build-bundle.js"
+    "build:simple-editor": "node tools/update-content-simple-editor.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6"
   }
 }

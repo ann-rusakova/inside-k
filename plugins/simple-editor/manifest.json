@@ -5,9 +5,7 @@
   "main": "code.js",
   "ui": "ui.html",
   "documentAccess": "dynamic-page",
-  "editorType": [
-    "figma"
-  ],
+  "editorType": ["figma"],
   "networkAccess": {
     "allowedDomains": [
       "https://api.anthropic.com",

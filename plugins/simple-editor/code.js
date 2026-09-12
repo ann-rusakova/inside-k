@@ -6,8 +6,14 @@ const MIN_SIZE = { width: 320, height: 480 };
 const MAX_SIZE = { width: 900, height: 1200 };
 
 function clampSize(size) {
-  const width = Math.min(MAX_SIZE.width, Math.max(MIN_SIZE.width, Math.round(size.width) || DEFAULT_SIZE.width));
-  const height = Math.min(MAX_SIZE.height, Math.max(MIN_SIZE.height, Math.round(size.height) || DEFAULT_SIZE.height));
+  const width = Math.min(
+    MAX_SIZE.width,
+    Math.max(MIN_SIZE.width, Math.round(size.width) || DEFAULT_SIZE.width)
+  );
+  const height = Math.min(
+    MAX_SIZE.height,
+    Math.max(MIN_SIZE.height, Math.round(size.height) || DEFAULT_SIZE.height)
+  );
   return { width, height };
 }
 
@@ -24,7 +30,7 @@ async function getInitialSize() {
 figma.showUI(__html__, {
   width: DEFAULT_SIZE.width,
   height: DEFAULT_SIZE.height,
-  themeColors: true
+  themeColors: true,
 });
 
 getInitialSize().then((size) => {
@@ -92,8 +98,8 @@ function collectFrameTexts(root) {
     if (found.length >= MAX_FRAME_TEXTS * 3) return;
     if (node.visible === false) return;
     if (node.type === "TEXT") {
-      const value = (node.characters || "").trim();
-      if (value) {
+      const value = node.characters || "";
+      if (value.trim()) {
         const point = nodePoint(node);
         found.push({ id: node.id, name: node.name || "", text: value, x: point.x, y: point.y });
       }
@@ -105,7 +111,9 @@ function collectFrameTexts(root) {
 
   walk(root);
   found.sort((a, b) => (Math.abs(a.y - b.y) > 4 ? a.y - b.y : a.x - b.x));
-  return found.slice(0, MAX_FRAME_TEXTS).map((item) => ({ id: item.id, name: item.name, text: item.text }));
+  return found
+    .slice(0, MAX_FRAME_TEXTS)
+    .map((item) => ({ id: item.id, name: item.name, text: item.text }));
 }
 
 function frameRootFor(node) {
@@ -139,7 +147,7 @@ async function getSelectionPayload() {
         frameId: root.id,
         nodeId: null,
         error: "",
-        ...info
+        ...info,
       };
     }
     return {
@@ -150,7 +158,7 @@ async function getSelectionPayload() {
       frameId: null,
       nodeId: null,
       error: "В этом слое нет текста.",
-      ...info
+      ...info,
     };
   }
 
@@ -164,7 +172,7 @@ async function getSelectionPayload() {
       frameId: null,
       nodeId: null,
       error: result.error,
-      ...info
+      ...info,
     };
   }
 
@@ -179,7 +187,7 @@ async function getSelectionPayload() {
     frameId: root ? root.id : null,
     nodeId: node.id,
     error: "",
-    ...info
+    ...info,
   };
 }
 
@@ -225,7 +233,7 @@ figma.on("selectionchange", async () => {
   const payload = await getSelectionPayload();
   figma.ui.postMessage({
     type: "selection-updated",
-    payload
+    payload,
   });
 });
 
@@ -237,41 +245,49 @@ figma.ui.onmessage = async (msg) => {
       const payload = await getSelectionPayload();
       figma.ui.postMessage({
         type: "selection-updated",
-        payload
+        payload,
       });
       break;
     }
     case "apply-variant": {
-      const { text, nodeId } = msg.payload || {};
+      const { text, nodeId, originalText } = msg.payload || {};
       if (!text || typeof text !== "string") break;
 
-      let node = null;
-      if (nodeId) {
-        node = await figma.getNodeByIdAsync(nodeId);
-        if (node && node.type !== "TEXT") node = null;
-      }
-      if (!node) {
-        const result = await getSelectedTextNode();
-        if (result.error) {
-          figma.ui.postMessage({
-            type: "action-error",
-            payload: { message: result.error }
-          });
-          break;
-        }
-        node = result.node;
-      }
-
       try {
+        let node = null;
+        if (nodeId) {
+          node = await figma.getNodeByIdAsync(nodeId);
+          if (!node || node.type !== "TEXT") {
+            throw new Error(
+              "Исходный текстовый слой больше недоступен. Выберите слой и повторите анализ."
+            );
+          }
+        }
+        if (!node) {
+          const result = await getSelectedTextNode();
+          if (result.error) {
+            figma.ui.postMessage({
+              type: "action-error",
+              payload: { message: result.error },
+            });
+            break;
+          }
+          node = result.node;
+        }
+
         await loadNodeFonts(node);
+        if (typeof originalText === "string" && node.characters !== originalText) {
+          throw new Error("Текст слоя изменился. Повторите анализ перед применением варианта.");
+        }
         node.characters = text;
-        figma.ui.postMessage({ type: "variant-applied" });
+        figma.ui.postMessage({ type: "variant-applied", payload: { nodeId: node.id, text } });
+        figma.ui.postMessage({ type: "selection-updated", payload: await getSelectionPayload() });
       } catch (error) {
         figma.ui.postMessage({
           type: "action-error",
           payload: {
-            message: `Не удалось применить текст: ${error && error.message ? error.message : "проверьте шрифт слоя"}`
-          }
+            message: `Не удалось применить текст: ${error && error.message ? error.message : "проверьте шрифт слоя"}`,
+          },
         });
       }
       break;
@@ -295,13 +311,13 @@ figma.ui.onmessage = async (msg) => {
       } catch (error) {
         figma.ui.postMessage({
           type: "action-error",
-          payload: { message: "Не удалось сохранить настройки." }
+          payload: { message: "Не удалось сохранить настройки.", action: "save-settings" },
         });
       }
       break;
     }
     case "load-settings": {
-      const settings = await loadSettings();
+      const settings = await loadSettings().catch(() => null);
       figma.ui.postMessage({ type: "settings-loaded", payload: settings });
       break;
     }
@@ -310,7 +326,7 @@ figma.ui.onmessage = async (msg) => {
       break;
     }
     case "load-cache": {
-      const cache = await loadCache();
+      const cache = await loadCache().catch(() => null);
       figma.ui.postMessage({ type: "cache-loaded", payload: cache });
       break;
     }
