@@ -2295,8 +2295,19 @@
         state.settings.apiTokens[state.settings.endpoint] = value;
       }
 
+      // Минимальная проверка ввода в плагине; действительность ключа проверяет API.
+      const MIN_API_TOKEN_LENGTH = 20;
+
+      function apiTokenError(value = currentApiToken()) {
+        const token = sanitizeApiKey(value);
+        if (!token) return "Добавьте API-ключ в Настройках.";
+        if (token.length < MIN_API_TOKEN_LENGTH)
+          return `Токен слишком короткий — нужно минимум ${MIN_API_TOKEN_LENGTH} символов без пробелов.`;
+        return "";
+      }
+
       function settingsFieldsFilled() {
-        if (!sanitizeApiKey(currentApiToken())) return false;
+        if (apiTokenError()) return false;
         if (state.settings.endpoint === "custom" && !(state.settings.apiUrl || "").trim())
           return false;
         return true;
@@ -2308,6 +2319,14 @@
         if (saveBtn) saveBtn.disabled = !filled;
         const checkBtn = document.getElementById("checkConnectionBtn");
         if (checkBtn) checkBtn.disabled = !filled || state.apiStatus === "checking";
+        const input = document.getElementById("apiTokenInput");
+        const error = Boolean(sanitizeApiKey(currentApiToken()) && apiTokenError());
+        if (input) input.setAttribute("aria-invalid", String(error));
+        const hint = document.getElementById("apiTokenHint");
+        if (hint)
+          hint.textContent = error
+            ? apiTokenError()
+            : `Минимум ${MIN_API_TOKEN_LENGTH} символов без пробелов`;
       }
 
       function getProviderConfig() {
@@ -2713,7 +2732,7 @@
       async function callModel(systemBlocks, user, schema) {
         ensureValidModel();
         const cfg = getProviderConfig();
-        if (!cfg.key) throw new Error("Добавьте API-ключ в Настройках.");
+        if (apiTokenError(cfg.key)) throw new Error(apiTokenError(cfg.key));
         state.apiStatus = "checking";
         render();
         const outerSignal = currentAbortController
@@ -2760,6 +2779,7 @@
         state.apiStatus = "checking";
         render();
         try {
+          if (apiTokenError()) throw new Error(apiTokenError());
           if (isMockMode()) {
             state.apiStatus = "idle";
             toast("Локальный предпросмотр вне Figma: проверка ключа не требуется", "success");
@@ -3218,6 +3238,8 @@
       }
 
       function saveSettings() {
+        // Пустое значение позволяет удалить сохранённый ключ, короткий черновик не сохраняем.
+        if (sanitizeApiKey(currentApiToken()) && apiTokenError()) return;
         bridge.send("save-settings", state.settings);
       }
 
@@ -3745,7 +3767,8 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             }
             <div class="field">
               <label class="field-label" for="apiTokenInput">Токен</label>
-              <input class="key-input" id="apiTokenInput" type="password" value="${escapeHtml(currentApiToken())}" placeholder="sk-..." />
+              <input class="key-input" id="apiTokenInput" type="password" value="${escapeHtml(currentApiToken())}" placeholder="sk-..." minlength="${MIN_API_TOKEN_LENGTH}" aria-describedby="apiTokenHint" aria-invalid="${Boolean(sanitizeApiKey(currentApiToken()) && apiTokenError())}" />
+              <div class="section-caption" id="apiTokenHint" aria-live="polite">${escapeHtml(sanitizeApiKey(currentApiToken()) && apiTokenError() ? apiTokenError() : `Минимум ${MIN_API_TOKEN_LENGTH} символов без пробелов`)}</div>
             </div>
             <div class="field">
               <label class="field-label" for="modelSelect">Модель</label>
