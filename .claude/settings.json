@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:simple-editor)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(ls)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(find *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; case \"$f\" in */references/redpolitika/*) echo '{\"systemMessage\": \"references/redpolitika изменена — запустите npm run build:simple-editor из корня, иначе плагин не увидит правки.\"}';; esac; } 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

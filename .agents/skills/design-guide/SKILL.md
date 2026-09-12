@@ -1,5 +1,5 @@
 ---
-name: ux-interview-guide
+name: design-guide
 description: >
   Design a structured qualitative research guide (discussion guide) for UX interviews based on
   Krueger's focus group and qualitative research methodology. Use this skill whenever a UX researcher

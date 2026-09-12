@@ -5,8 +5,8 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = __dirname;
-const DATA = path.join(ROOT, "data");
-const UI = path.join(ROOT, "ui.html");
+const DATA = path.join(ROOT, "..", "references", "redpolitika");
+const UI = path.join(ROOT, "..", "plugins", "simple-editor", "ui.html");
 const REGISTRY = path.join(DATA, "sources.json");
 
 // Единственный список источников — data/sources.json.

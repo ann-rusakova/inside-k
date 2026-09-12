@@ -1,0 +1,9 @@
+{
+  "name": "inside-k",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UX-исследования и редактура Контура: скиллы + Figma-плагин",
+  "scripts": {
+    "build:simple-editor": "node plugins/simple-editor/build-bundle.js"
+  }
+}

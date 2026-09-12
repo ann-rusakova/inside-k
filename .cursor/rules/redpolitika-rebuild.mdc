@@ -1,0 +1,20 @@
+---
+description: Правки редполитики Контура требуют пересборки Figma-плагина
+globs: references/redpolitika/**
+alwaysApply: false
+---
+
+`references/redpolitika/` — единственный источник правил редполитики. Его читают скиллы
+`only-editor`/`full-analysis-text` напрямую, а Figma-плагин `plugins/simple-editor` — через
+симлинк `plugins/simple-editor/data -> ../../references/redpolitika`, но **не в рантайме**:
+файлы вшиваются в `ui.html` на этапе сборки.
+
+После любой правки в этой папке (включая `sources.json`) обязательно выполните из корня
+репозитория:
+
+```bash
+npm run build:simple-editor
+```
+
+Без этого шага изменения не попадут ни в системный промпт плагина, ни в экран «Правила» —
+плагин продолжит работать со старой версией правил.
