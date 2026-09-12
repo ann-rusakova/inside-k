@@ -1,0 +1,22 @@
+{
+  "name": "Просто редактор",
+  "id": "kontur-editor",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figma"
+  ],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://api.anthropic.com",
+      "https://api.openai.com",
+      "https://claude-n-codex.com:8443",
+      "https://guides.kontur.ru",
+      "https://in.kontur.ru",
+      "https://s.kontur.ru"
+    ],
+    "reasoning": "API access is required for text analysis"
+  }
+}
