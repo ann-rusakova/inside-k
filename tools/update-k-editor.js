@@ -137,129 +137,19 @@ async function main() {
   const next = await prettier.format(generated, { ...options, filepath: UI });
 
   verifyPlugin(next);
-  updateSkillsPackage(process.argv.includes("--check"));
 
   if (process.argv.includes("--check")) {
     if (html !== next) {
-      throw new Error("База знаний устарела. Запустите npm run update:plugin.");
+      throw new Error("База знаний устарела. Запустите npm run build:k-editor.");
     }
   } else if (html !== next) {
     fs.writeFileSync(UI, next);
   }
   console.log(
     process.argv.includes("--check")
-      ? "Figma-плагин и пакет скиллов актуальны, проверки прошли."
-      : "Figma-плагин и пакет скиллов собраны, проверки прошли. Перезапустите Figma-плагин; пакет Codex установите из marketplace."
+      ? "Figma-плагин актуален, проверки прошли."
+      : "Figma-плагин собран, проверки прошли. Перезапустите плагин в Figma."
   );
-}
-
-// Пакет для распространения генерируется из исходников, без симлинков наружу.
-function updateSkillsPackage(checkOnly) {
-  const pluginRoot = path.join(root, "plugins", "inside-k");
-  const manifest = JSON.parse(
-    fs.readFileSync(path.join(pluginRoot, ".codex-plugin", "plugin.json"), "utf8")
-  );
-  assert.equal(manifest.name, "inside-k");
-  assert.equal(manifest.skills, "./skills/");
-  const marketplace = JSON.parse(
-    fs.readFileSync(path.join(root, ".agents", "plugins", "marketplace.json"), "utf8")
-  );
-  const entry = marketplace.plugins.find((plugin) => plugin.name === manifest.name);
-  assert.equal(entry?.source?.path, "./plugins/inside-k");
-  assert.equal(entry?.source?.source, "local");
-
-  function collectFiles(directory, relativeDirectory = "") {
-    const collected = new Map();
-    if (!fs.existsSync(directory)) {
-      return collected;
-    }
-    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-      if (entry.name === ".DS_Store") {
-        continue;
-      }
-      const sourcePath = path.join(directory, entry.name);
-      const relativePath = path.posix.join(relativeDirectory, entry.name);
-      if (entry.isDirectory()) {
-        for (const [filename, content] of collectFiles(sourcePath, relativePath)) {
-          collected.set(filename, content);
-        }
-      } else {
-        assert.ok(entry.isFile(), `Симлинк или неподдерживаемый файл: ${sourcePath}`);
-        collected.set(relativePath, fs.readFileSync(sourcePath));
-      }
-    }
-    return collected;
-  }
-
-  const skillFiles = collectFiles(path.join(root, ".agents", "skills"), "skills");
-  assert.ok(skillFiles.size > 0, "Не найдены исходники скиллов");
-  const generatedFiles = new Map();
-  for (const [filename, content] of skillFiles) {
-    // В пакете skills/<name> на один уровень ближе к общей references/.
-    generatedFiles.set(
-      filename,
-      filename.endsWith(".md")
-        ? Buffer.from(
-            content.toString("utf8").replaceAll("../../../references/", "../../references/")
-          )
-        : content
-    );
-  }
-  for (const [filename, content] of collectFiles(path.join(root, "references"), "references")) {
-    generatedFiles.set(filename, content);
-  }
-  const skillNames = new Set([...skillFiles.keys()].map((filename) => filename.split("/")[1]));
-  for (const name of skillNames) {
-    const skillFile = generatedFiles.get(`skills/${name}/SKILL.md`);
-    assert.ok(skillFile, `Нет SKILL.md: ${name}`);
-    assert.equal(skillFile.toString("utf8").match(/^name:\s*(.+)$/m)?.[1], name);
-  }
-  for (const [filename, content] of generatedFiles) {
-    if (!filename.endsWith(".md")) {
-      continue;
-    }
-    const text = content.toString("utf8");
-    const markdownLinks = [...text.matchAll(/\]\(([^)]+\.md)(?:#[^)]*)?\)/g)].map(
-      (match) => match[1]
-    );
-    const inlinePaths = [
-      ...text.matchAll(/`((?:references?|examples|assets|scripts)\/[^`]+\.md)`/g),
-    ].map((match) => match[1]);
-    for (const link of [...markdownLinks, ...inlinePaths]) {
-      if (/^https?:\/\//.test(link)) {
-        continue;
-      }
-      const target = path.posix.normalize(path.posix.join(path.posix.dirname(filename), link));
-      assert.ok(generatedFiles.has(target), `Битая ссылка в пакете: ${filename} → ${link}`);
-    }
-  }
-
-  const existingFiles = new Map([
-    ...collectFiles(path.join(pluginRoot, "skills"), "skills"),
-    ...collectFiles(path.join(pluginRoot, "references"), "references"),
-  ]);
-  const changedFiles = [...generatedFiles].filter(
-    ([filename, content]) => !existingFiles.get(filename)?.equals(content)
-  );
-  const obsoleteFiles = [...existingFiles.keys()].filter(
-    (filename) => !generatedFiles.has(filename)
-  );
-  if (checkOnly) {
-    assert.ok(
-      !changedFiles.length && !obsoleteFiles.length,
-      "Пакет скиллов устарел. Запустите npm run update:plugin."
-    );
-    return;
-  }
-  for (const [filename, content] of changedFiles) {
-    const destination = path.join(pluginRoot, filename);
-    fs.mkdirSync(path.dirname(destination), { recursive: true });
-    fs.writeFileSync(destination, content);
-  }
-  for (const filename of obsoleteFiles) {
-    fs.unlinkSync(path.join(pluginRoot, filename));
-  }
-  console.log(`Пакет inside-k: ${skillNames.size} скиллов, ${generatedFiles.size} файлов.`);
 }
 
 function verifyPlugin(html) {

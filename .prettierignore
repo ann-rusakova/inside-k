@@ -3,7 +3,3 @@ package-lock.json
 
 .claude/skills/
 .cursor/skills/
-
-# Generated skill package; format sources, then rebuild.
-plugins/inside-k/skills/
-plugins/inside-k/references/

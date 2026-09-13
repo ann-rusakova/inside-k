@@ -4,10 +4,8 @@
   "private": true,
   "description": "UX-исследования и редактура Контура: скиллы + Figma-плагины",
   "scripts": {
-    "update:plugin": "node tools/update-k-editor.js",
     "build:k-editor": "node tools/update-k-editor.js",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format": "prettier --write ."
   },
   "engines": {
     "node": ">=22"

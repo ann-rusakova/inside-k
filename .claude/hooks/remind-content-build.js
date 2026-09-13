@@ -22,7 +22,7 @@ try {
     console.log(
       JSON.stringify({
         systemMessage:
-          "Скилл или справочник изменён — запустите npm run update:plugin из корня, чтобы обновить Figma-плагин и пакет Codex.",
+          "Скилл или справочник изменён — запустите npm run build:k-editor из корня, чтобы обновить Figma-плагин.",
       })
     );
   }
