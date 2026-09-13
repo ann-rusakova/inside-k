@@ -1828,6 +1828,7 @@
         toasts: [],
         apiStatus: "idle",
         helpOpen: "",
+        apiTokenUnlocked: {},
       };
 
       let toastSeq = 0;
@@ -2141,8 +2142,12 @@
           render();
         }
         if (data.type === "settings-saved") {
-          explicitSaveCount = Math.max(0, explicitSaveCount - 1);
-          toast("Настройки сохранены", "success");
+          if (explicitSaveCount > 0) {
+            explicitSaveCount -= 1;
+            toast("Настройки сохранены", "success");
+            state.apiTokenUnlocked[state.settings.endpoint] = false;
+            render();
+          }
         }
         if (data.type === "variant-applied") {
           const { nodeId, text } = data.payload || {};
@@ -2377,6 +2382,20 @@
         return true;
       }
 
+      // Токен считаем «зафиксированным», пока он валиден и пользователь явно не нажал
+      // «Изменить» — так его нельзя случайно скопировать или подсмотреть целиком.
+      function isApiTokenLocked() {
+        const token = sanitizeApiKey(currentApiToken());
+        return (
+          Boolean(token) && !apiTokenError() && !state.apiTokenUnlocked[state.settings.endpoint]
+        );
+      }
+
+      function maskApiToken(token) {
+        const clean = sanitizeApiKey(token);
+        return clean.length <= 4 ? clean : `${clean.slice(0, 4)}••••••••`;
+      }
+
       function updateSettingsActionButtons() {
         const filled = settingsFieldsFilled();
         const saveBtn = document.getElementById("saveSettingsBtn");
@@ -2386,11 +2405,6 @@
         const input = document.getElementById("apiTokenInput");
         const error = Boolean(sanitizeApiKey(currentApiToken()) && apiTokenError());
         if (input) input.setAttribute("aria-invalid", String(error));
-        const hint = document.getElementById("apiTokenHint");
-        if (hint)
-          hint.textContent = error
-            ? apiTokenError()
-            : `Минимум ${MIN_API_TOKEN_LENGTH} символов без пробелов`;
       }
 
       function getProviderConfig() {
@@ -3761,7 +3775,18 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             }
             <div class="field">
               <label class="field-label" for="apiTokenInput">Токен</label>
+              ${
+                isApiTokenLocked()
+                  ? `
+              <div class="key-row">
+                <input class="key-input" id="apiTokenInput" type="text" value="${escapeHtml(maskApiToken(currentApiToken()))}" disabled readonly />
+                <button class="btn-check" id="changeApiTokenBtn" type="button">Изменить</button>
+              </div>
+              `
+                  : `
               <input class="key-input" id="apiTokenInput" type="password" value="${escapeHtml(currentApiToken())}" placeholder="sk-..." minlength="${MIN_API_TOKEN_LENGTH}" aria-invalid="${Boolean(sanitizeApiKey(currentApiToken()) && apiTokenError())}" />
+              `
+              }
             </div>
             <div class="field">
               <label class="field-label" for="modelSelect">Модель</label>
@@ -4536,6 +4561,16 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             state.settings.apiUrl = apiUrlInput.value;
             saveSettingsDebounced();
             updateSettingsActionButtons();
+          };
+        }
+
+        const changeApiTokenBtn = document.getElementById("changeApiTokenBtn");
+        if (changeApiTokenBtn) {
+          changeApiTokenBtn.onclick = () => {
+            state.apiTokenUnlocked[state.settings.endpoint] = true;
+            setCurrentApiToken("");
+            render();
+            document.getElementById("apiTokenInput")?.focus();
           };
         }
 
