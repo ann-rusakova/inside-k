@@ -4004,6 +4004,13 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         const score = Number(result.score || 0);
         const active = state.mode;
         const hasBottomBar = !state.loading && state.variants.length;
+        const issues = Array.isArray(result.issues)
+          ? result.issues.filter((item) => item?.recommendation)
+          : [];
+        const fixItems = issues.map(
+          (issue, idx) =>
+            `<li class="fix-item" data-fragment-idx="${idx}">${escapeHtml(issue.recommendation)}</li>`
+        );
         return `
         <div class="screen padded-flush ${hasBottomBar ? "" : "no-bottom-bar"}">
           <div class="${state.loading ? "is-dimmed" : ""}">
@@ -4014,7 +4021,13 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
                 <span class="tooltip-bubble">Показывает, насколько текст соответствует стандартам редполитики. Учитывает пунктуацию, числа, термины и стиль</span>
               </button>
             </div>
-            ${resultCardHtml(result.text || state.selectionText, result.tags, score, true, result.issues)}
+            ${resultCardHtml(result.text || state.selectionText, result.tags, score, false, result.issues)}
+            <div class="fix-section">
+              <div class="fix-title">Как исправить текст</div>
+              <ul class="fix-list">
+                ${fixItems.length ? fixItems.join("") : "<li>Замечаний нет</li>"}
+              </ul>
+            </div>
             <div class="actions">
               ${modeButtonHtml("rephrase", ICONS.refresh, "Переформулировать", active)}
               ${modeButtonHtml("shorten", ICONS.scissors, "Сократить", active)}
