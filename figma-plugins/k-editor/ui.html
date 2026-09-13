@@ -2069,7 +2069,6 @@
       }
 
       window.onmessage = (event) => {
-        if (event.source !== parent && event.source !== window) return;
         const raw = event && event.data;
         if (!raw || typeof raw !== "object") return;
         const data = raw.pluginMessage || raw;
