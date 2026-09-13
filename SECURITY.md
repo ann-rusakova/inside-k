@@ -21,8 +21,8 @@ UX-исследований и редактуры Контура. Нет сер�
 ответственному за репозиторий через внутренний канал отдела (Slack/тикет), указав:
 
 - что нашли и как воспроизвести;
-- затронутый компонент (`plugins/simple-editor/`, `tools/`, `.agents/skills/`,
-  `.claude/settings.json`, `.claude/hooks/`);
+- затронутый компонент (`figma-plugins/k-editor/`, `tools/`, `.agents/skills/`,
+  `plugins/inside-k/`, `.agents/plugins/marketplace.json`, `.claude/settings.json`, `.claude/hooks/`);
 - оценку impact (утечка ключа, произвольный сетевой запрос из плагина, инъекция через
   содержимое скилла).
 
@@ -34,11 +34,14 @@ UX-исследований и редактуры Контура. Нет сер�
 
 ### In scope
 
-- Figma-плагин `plugins/simple-editor/` (`code.js`, `ui.html`, `manifest.json`) —
+- Figma-плагин `figma-plugins/k-editor/` (`code.js`, `ui.html`, `manifest.json`) —
   единственный компонент, который делает сетевые запросы и хранит данные пользователя;
-- сборщик `tools/update-content-simple-editor.js` — читает только локальные файлы
+- сборщик `tools/update-k-editor.js` — читает только локальные файлы
   репозитория, сети не касается;
 - скиллы в `.agents/skills/` — инструкции для агента, не исполняемый код;
+- `plugins/inside-k/` и `.agents/plugins/marketplace.json` — пакет скиллов и каталог Codex;
+  пакет содержит копии методик и справочников для распространения, без API-ключей;
+- `.claude/skills` и `.cursor/skills` — ссылки на исходники скиллов;
 - `.claude/settings.json` — подключение хуков и allowlist разрешённых команд;
 - `.claude/hooks/remind-content-build.js` — напоминание о сборке базы знаний.
 
@@ -58,7 +61,7 @@ UX-исследований и редактуры Контура. Нет сер�
   [README.md](README.md#плагины)). При запросе ключ и анализируемый текст передаются
   выбранному провайдеру или серверу, указанному в поле «Свой». В браузерном предпросмотре
   введённый ключ живёт только в памяти вкладки и не сохраняется в localStorage.
-- `plugins/simple-editor/manifest.json` → `networkAccess.allowedDomains` — единственный
+- `figma-plugins/k-editor/manifest.json` → `networkAccess.allowedDomains` — единственный
   список доменов, куда плагин имеет право обращаться (правило добавления — в
   [AGENTS.md](AGENTS.md#границы)). Нестандартный домен `claude-n-codex.com:8443` —
   разрешён для пользовательского подключения по OpenAI-совместимому протоколу.
@@ -72,8 +75,8 @@ UX-исследований и редактуры Контура. Нет сер�
 - В Figma по умолчанию выбран Anthropic; для анализа нужен API-ключ.
   Вне Figma работает локальный предпросмотр с Mock-анализом. Шрифты при этом могут
   загружаться с `s.kontur.ru`.
-- Сборка (`npm run build:simple-editor`) не выполняет сетевых запросов — вся база знаний
-  читается из `references/` на диске.
+- Сборка (`npm run build:k-editor`) не выполняет сетевых запросов — вся база знаний
+  читается из `.agents/skills/` и `references/` на диске.
 - Хук `.claude/hooks/remind-content-build.js`, подключённый в `.claude/settings.json`,
   печатает напоминание о сборке. Как и любой command hook,
   он запускает команду оболочки; allowlist инструментов Bash не является его песочницей.
@@ -85,5 +88,5 @@ UX-исследований и редактуры Контура. Нет сер�
 известных уязвимостей — `npm audit`. При обновлении Prettier запускайте проверку
 форматирования и сборку базы знаний.
 
-Плагин (`plugins/simple-editor/`) не использует npm-пакеты в рантайме:
+Плагин (`figma-plugins/k-editor/`) не использует npm-пакеты в рантайме:
 `code.js` и `ui.html` исполняются в песочнице Figma без Node.js.

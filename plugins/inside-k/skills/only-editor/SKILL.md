@@ -23,13 +23,13 @@ description: >
 1. Определи тип фрагмента: кнопка/CTA, заголовок, тост/хинт, подпись поля, подсказка-плейсхолдер,
    тело сообщения. От типа зависит, какие правила применимы (пунктуация в тостах ≠ пунктуация в теле).
 2. Проверь фрагмент по приоритетным источникам (полные тексты, самые частые нарушения):
-   - [`../../../references/editorial-policy/screen-typography-rules.md`](../../../references/editorial-policy/screen-typography-rules.md) — неразрывные пробелы, кавычки, тире/дефис/минус
-   - [`../../../references/editorial-policy/disputed-words-rules.md`](../../../references/editorial-policy/disputed-words-rules.md) — спорные слова и штампы
-   - [`../../../references/editorial-policy/letters-rules.md`](../../../references/editorial-policy/letters-rules.md) — регистр, капс, «вы»
-   - [`../../../references/editorial-policy/numbers-currency-rules.md`](../../../references/editorial-policy/numbers-currency-rules.md) — числа, даты, валюта
-   - [`../../../references/editorial-policy/signs-rules.md`](../../../references/editorial-policy/signs-rules.md) — знаки препинания и спецсимволы
+   - [`../../references/editorial-policy/screen-typography-rules.md`](../../references/editorial-policy/screen-typography-rules.md) — неразрывные пробелы, кавычки, тире/дефис/минус
+   - [`../../references/editorial-policy/disputed-words-rules.md`](../../references/editorial-policy/disputed-words-rules.md) — спорные слова и штампы
+   - [`../../references/editorial-policy/letters-rules.md`](../../references/editorial-policy/letters-rules.md) — регистр, капс, «вы»
+   - [`../../references/editorial-policy/numbers-currency-rules.md`](../../references/editorial-policy/numbers-currency-rules.md) — числа, даты, валюта
+   - [`../../references/editorial-policy/signs-rules.md`](../../references/editorial-policy/signs-rules.md) — знаки препинания и спецсимволы
 3. Дополнительно (только разделы, которых нет в источниках выше — «Под запретом», «Простой язык»,
-   «Словарь терминов») см. [`../../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../../references/editorial-policy/svodnye-pravila-po-gruppam.md).
+   «Словарь терминов») см. [`../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../references/editorial-policy/svodnye-pravila-po-gruppam.md).
    Разделы «Типографика» и «Числа» там дублируют файлы выше — не пересказывай их дважды.
 4. Дай короткий список нарушений с точной цитатой фрагмента (а не общей формулировкой совета) —
    пользователю в интерфейсе плагина это подсвечивает проблемное место в тексте.

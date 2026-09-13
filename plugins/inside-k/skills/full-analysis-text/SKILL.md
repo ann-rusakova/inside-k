@@ -24,16 +24,16 @@ description: >
 1. Прочитай весь текст целиком и определи его тип (экран, письмо, попап, серия тостов) — это
    влияет на применимые правила (тон робота vs Контура, пунктуация подписей vs абзацев).
 2. Проверь текст по сводному документу
-   [`../../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../../references/editorial-policy/svodnye-pravila-po-gruppam.md) —
+   [`../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../references/editorial-policy/svodnye-pravila-po-gruppam.md) —
    это единственный источник, по которому в плагине считается индекс качества, он покрывает все
    группы правил одним файлом.
 3. Для неоднозначных случаев (спорное слово, точное написание чужого названия, редкий формат
    числа) уточни в специализированном источнике, а не гадай по сводке:
-   - [`../../../references/editorial-policy/disputed-words-rules.md`](../../../references/editorial-policy/disputed-words-rules.md)
-   - [`../../../references/editorial-policy/company-names-rules.md`](../../../references/editorial-policy/company-names-rules.md)
-   - [`../../../references/editorial-policy/laws-services-names-rules.md`](../../../references/editorial-policy/laws-services-names-rules.md)
-   - [`../../../references/editorial-policy/simple-words-rules.md`](../../../references/editorial-policy/simple-words-rules.md)
-   - [`../../../references/editorial-policy/osnovnye_pravila_teksta_v_interfeise.md`](../../../references/editorial-policy/osnovnye_pravila_teksta_v_interfeise.md) — базовая логика «зачем этот текст вообще нужен»
+   - [`../../references/editorial-policy/disputed-words-rules.md`](../../references/editorial-policy/disputed-words-rules.md)
+   - [`../../references/editorial-policy/company-names-rules.md`](../../references/editorial-policy/company-names-rules.md)
+   - [`../../references/editorial-policy/laws-services-names-rules.md`](../../references/editorial-policy/laws-services-names-rules.md)
+   - [`../../references/editorial-policy/simple-words-rules.md`](../../references/editorial-policy/simple-words-rules.md)
+   - [`../../references/editorial-policy/osnovnye_pravila_teksta_v_interfeise.md`](../../references/editorial-policy/osnovnye_pravila_teksta_v_interfeise.md) — базовая логика «зачем этот текст вообще нужен»
 4. Посчитай индекс качества 0–10 (ориентир по шкале плагина: 0–4 — серьёзные проблемы, 5–7 —
    есть что доработать, 8–9 — почти готово, 10 — без замечаний) и оформи вывод:
    - индекс + короткое обоснование

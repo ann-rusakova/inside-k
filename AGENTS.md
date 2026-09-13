@@ -5,21 +5,26 @@
 
 ## Структура
 
-- `.agents/skills/` — источник правды для скиллов. `.claude/skills` — симлинк на неё
-  (`.claude/skills -> ../.agents/skills`), редактируй только оригинал в `.agents/`.
+- `.agents/skills/` — источник правды для скиллов. `.claude/skills` и `.cursor/skills` —
+  симлинки на `../.agents/skills`, редактируй только оригинал в `.agents/`.
 - `references/editorial-policy/` — общие файлы редполитики Контура (типографика, спорные слова, числа,
   названия), реестр источников — `references/sources.json` (на уровень выше). Единственный
   источник: на них ссылаются скиллы `only-editor`/`full-analysis-text`
   (по пути `../../../references/editorial-policy/...`) и Figma-плагины через сборщик
-  `tools/update-content-simple-editor.js`, который читает их напрямую и вшивает в
-  `plugins/simple-editor/ui.html`. Не дублируй эти файлы — добавляй новые правила только сюда,
-  `npm run build:simple-editor` (из корня) подхватит их автоматически.
-- `plugins/simple-editor/` — Figma-плагин «Просто редактор» (UX-редактура текста в макете,
+  `tools/update-k-editor.js`, который читает их напрямую и вшивает в
+  `figma-plugins/k-editor/ui.html`. Не дублируй эти файлы — добавляй новые правила только сюда,
+  `npm run build:k-editor` (из корня) подхватит их автоматически.
+- `figma-plugins/k-editor/` — Figma-плагин «К редактор» (UX-редактура текста в макете,
   Claude/OpenAI API). Содержит только `code.js`/`manifest.json`/`ui.html` — ни данных, ни сборки
   внутри папки нет, всё вынесено наружу (`references/`, `tools/`). Документация — в
   [README.md](README.md#плагины), отдельного README в папке плагина нет.
-- `tools/update-content-simple-editor.js` — сборщик базы знаний плагина, запускается через
-  `npm run build:simple-editor` из корня.
+- `plugins/inside-k/` — распространяемый пакет Codex. `skills/` и `references/` внутри него —
+  генерируемые копии для установки вне репозитория, вручную не редактировать. Источник правды
+  остаётся в `.agents/skills/` и корневой `references/`; адаптацию ссылок делает сборщик.
+- `.agents/plugins/marketplace.json` — каталог Codex, указывает на `plugins/inside-k/`.
+- `tools/update-k-editor.js` — единый сборщик Figma-плагина и пакета скиллов. Запускать
+  `npm run update:plugin` после изменения любого скилла или справочника. Генерируемый пакет
+  коммитится вместе с исходниками. `--check` проверяет актуальность без записи.
 - `SOUL.md` — тон и принципы работы отдела, не дублирует технические правила отсюда.
 
 ## Скиллы
@@ -39,10 +44,12 @@
 Действующие скиллы: `design-guide`, `jtbd`, `qualitative-analysis-rules`, `survey`,
 `only-editor`, `full-analysis-text`.
 
-## Плагины (`plugins/simple-editor`)
+## Плагины (`figma-plugins/k-editor`)
 
-- Сборка базы знаний в UI: `npm run build:simple-editor` из корня — обязательно после правки файлов в
-  `references/editorial-policy/`, иначе изменения не попадут ни в промпт, ни в экран «Правила».
+- Сборка базы знаний в UI: `npm run build:k-editor` из корня — обязательно после правки файлов в
+  `references/editorial-policy/`, `.agents/skills/only-editor/SKILL.md` или
+  `.agents/skills/full-analysis-text/SKILL.md`. Сборщик вшивает инструкции скиллов в промпты
+  соответствующих режимов, а редполитику — также в экран «Правила».
 - Единый реестр источников — `references/sources.json`, не дублируй список руками.
 - Ключи API (Anthropic/OpenAI) — только в `figma.clientStorage` пользователя, никогда не
   коммитить в репозиторий.

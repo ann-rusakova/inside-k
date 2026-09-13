@@ -2,17 +2,27 @@
 "use strict";
 // PostToolUse: читает JSON из stdin, не запускает команды из входных данных.
 const fs = require("node:fs");
+const path = require("node:path");
+
 try {
   const input = JSON.parse(fs.readFileSync(0, "utf8"));
   const file = input.tool_input?.file_path;
-  if (
-    typeof file === "string" &&
-    /(?:^|\/)references\/(?:editorial-policy\/|sources\.json$)/.test(file)
-  ) {
+  if (typeof file !== "string") {
+    process.exit(0);
+  }
+
+  const projectRoot = path.resolve(__dirname, "../..");
+  const relativePath = path
+    .relative(projectRoot, path.resolve(projectRoot, file.replaceAll("\\", "/")))
+    .split(path.sep)
+    .join("/");
+  const isSkill = /^(?:\.agents|\.claude|\.cursor)\/skills\//.test(relativePath);
+  const isReference = relativePath.startsWith("references/");
+  if (isSkill || isReference) {
     console.log(
       JSON.stringify({
         systemMessage:
-          "references/ изменена — запустите npm run build:simple-editor из корня, иначе плагин не увидит правки.",
+          "Скилл или справочник изменён — запустите npm run update:plugin из корня, чтобы обновить Figma-плагин и пакет Codex.",
       })
     );
   }
