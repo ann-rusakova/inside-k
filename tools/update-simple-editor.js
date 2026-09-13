@@ -12,7 +12,7 @@ async function main() {
   const ROOT = __dirname;
   const REFERENCES = path.join(ROOT, "..", "references");
   const DATA = path.join(REFERENCES, "editorial-policy");
-  const UI = path.join(ROOT, "..", "figma-plugins", "k-editor", "ui.html");
+  const UI = path.join(ROOT, "..", "figma-plugins", "simple-editor", "ui.html");
   const REGISTRY = path.join(REFERENCES, "sources.json");
 
   // Единственный список источников — references/sources.json.
@@ -140,7 +140,7 @@ async function main() {
 
   if (process.argv.includes("--check")) {
     if (html !== next) {
-      throw new Error("База знаний устарела. Запустите npm run build:k-editor.");
+      throw new Error("База знаний устарела. Запустите npm run build:simple-editor.");
     }
   } else if (html !== next) {
     fs.writeFileSync(UI, next);
@@ -153,7 +153,7 @@ async function main() {
 }
 
 function verifyPlugin(html) {
-  const pluginDirectory = path.join(root, "figma-plugins", "k-editor");
+  const pluginDirectory = path.join(root, "figma-plugins", "simple-editor");
   const manifest = JSON.parse(fs.readFileSync(path.join(pluginDirectory, "manifest.json"), "utf8"));
   assert.equal(manifest.main, "code.js", "Неверная точка входа Figma-плагина");
   assert.equal(manifest.ui, "ui.html", "Неверный путь к UI Figma-плагина");

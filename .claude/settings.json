@@ -1,8 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build:k-editor)",
-      "Bash(npm run build:k-editor)",
+      "Bash(npm run build:simple-editor)",
       "Bash(git status)",
       "Bash(git status *)",
       "Bash(git diff)",

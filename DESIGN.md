@@ -1,6 +1,6 @@
 # Дизайн-система Figma-плагинов
 
-Справочник по UI `figma-plugins/k-editor/ui.html` — единственному месту в репозитории с
+Справочник по UI `figma-plugins/simple-editor/ui.html` — единственному месту в репозитории с
 собственным визуальным дизайном (скиллы и `references/` — это текст, не интерфейс).
 
 ## Характер интерфейса
@@ -19,7 +19,7 @@
 
 ## Источник правды
 
-Всё в одном файле — `figma-plugins/k-editor/ui.html`:
+Всё в одном файле — `figma-plugins/simple-editor/ui.html`:
 
 | Что                                  | Где                                                                          |
 | ------------------------------------ | ---------------------------------------------------------------------------- |
@@ -95,12 +95,12 @@ Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif` — бренд
 - [ ] Иконка — добавлена в `ICONS`, не как внешний файл
 - [ ] Анимация — через `--dur-fast`/`--dur-base`, работает и с `prefers-reduced-motion`
 - [ ] Проверено в самой Figma (`Import plugin from manifest...`), не только в браузерном mock-режиме
-- [ ] После правки текста базы знаний — не забыт `npm run build:k-editor`
+- [ ] После правки текста базы знаний — не забыт `npm run build:simple-editor`
 
 ## Связанные файлы
 
 | Файл                                                                           | Содержание                               |
 | ------------------------------------------------------------------------------ | ---------------------------------------- |
-| [`figma-plugins/k-editor/ui.html`](figma-plugins/k-editor/ui.html)             | Весь UI: стили, разметка, логика рендера |
-| [`figma-plugins/k-editor/manifest.json`](figma-plugins/k-editor/manifest.json) | Точки входа плагина, `networkAccess`     |
+| [`figma-plugins/simple-editor/ui.html`](figma-plugins/simple-editor/ui.html)             | Весь UI: стили, разметка, логика рендера |
+| [`figma-plugins/simple-editor/manifest.json`](figma-plugins/simple-editor/manifest.json) | Точки входа плагина, `networkAccess`     |
 | [`README.md`](README.md#плагины)                                               | Установка, провайдеры, публикация        |

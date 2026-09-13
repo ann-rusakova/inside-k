@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>К редактор</title>
+    <title>Просто редактор</title>
     <style>
       @font-face {
         font-family: "Lab Grotesque";
@@ -584,6 +584,10 @@
         display: flex;
         gap: 8px;
         margin-top: 8px;
+      }
+
+      .field > .key-row {
+        margin-top: 0;
       }
 
       .key-row + .select-input,
@@ -1647,7 +1651,7 @@
       const BUNDLED_SKILLS = {
         "only-editor": {
           instructions:
-            '# Точечная редактура интерфейсного текста\n\nЭто аналог режима «Редактор» плагина «К редактор»: пользователь уже выбрал ровно один\nфрагмент (не весь текст экрана), и нужно быстро дать варианты правки, а не полный аудит.\n\n## Что делать\n\n1. Определи тип фрагмента: кнопка/CTA, заголовок, тост/хинт, подпись поля, подсказка-плейсхолдер,\n   тело сообщения. От типа зависит, какие правила применимы (пунктуация в тостах ≠ пунктуация в теле).\n2. Проверь фрагмент по приоритетным источникам (полные тексты, самые частые нарушения):\n   - [`../../../references/editorial-policy/screen-typography-rules.md`](../../../references/editorial-policy/screen-typography-rules.md) — неразрывные пробелы, кавычки, тире/дефис/минус\n   - [`../../../references/editorial-policy/disputed-words-rules.md`](../../../references/editorial-policy/disputed-words-rules.md) — спорные слова и штампы\n   - [`../../../references/editorial-policy/letters-rules.md`](../../../references/editorial-policy/letters-rules.md) — регистр, капс, «вы»\n   - [`../../../references/editorial-policy/numbers-currency-rules.md`](../../../references/editorial-policy/numbers-currency-rules.md) — числа, даты, валюта\n   - [`../../../references/editorial-policy/signs-rules.md`](../../../references/editorial-policy/signs-rules.md) — знаки препинания и спецсимволы\n3. Дополнительно (только разделы, которых нет в источниках выше — «Под запретом», «Простой язык»,\n   «Словарь терминов») см. [`../../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../../references/editorial-policy/svodnye-pravila-po-gruppam.md).\n   Разделы «Типографика» и «Числа» там дублируют файлы выше — не пересказывай их дважды.\n4. Дай короткий список нарушений с точной цитатой фрагмента (а не общей формулировкой совета) —\n   пользователю в интерфейсе плагина это подсвечивает проблемное место в тексте.\n5. Предложи варианты правки по запрошенному режиму:\n   - **Переформулировать** — та же мысль, другими словами, без изменения длины/тона\n   - **Сократить** — та же мысль короче, без потери смысла\n   - **Сделать четче** — убрать двусмысленность и общие слова, оставить конкретику\n   - **Сделать дружелюбнее** — смягчить тон, не теряя конкретику (см. «Тон и голос» в сводке)\n     Если режим не указан явно — предложи 2–3 варианта в разных режимах и спроси, какой ближе.\n\n## Гоучи\n\n- **Не путай «Редактор» с «Полным анализом»**: здесь не нужна оценка 0–10 и общий индекс качества —\n  это отдельный режим плагина (full-analysis-text). Если пользователь просит и оценку, и правку —\n  сначала спроси, нужен полный аудит или точечная правка.\n- **Тосты/хинты/тултипы-подписи не заканчиваются точкой**, если это одно предложение — модель\n  систематически добавляет точку по умолчанию, проверяй тип фрагмента перед финальным ответом.\n- **«Вы» со строчной буквы** даже в вежливой формулировке — не путай с орфографическим Вы из\n  официальных писем, это разные регистры.\n- Если фрагмент — кнопка подтверждения удаления/необратимого действия, формулировка должна называть\n  конкретное последствие («Удалить доверенность для ООО "Ромашка"»), а не быть общим «Да»/«Продолжить».\n- Не сокращай ради сокращения: краткость должна сохранять баланс «простота + краткость + польза»\n  (см. «Основные правила» в сводке) — если сокращение теряет нужную пользователю деталь, это не\n  победа.',
+            '# Точечная редактура интерфейсного текста\n\nЭто аналог режима «Редактор» плагина «Просто редактор»: пользователь уже выбрал ровно один\nфрагмент (не весь текст экрана), и нужно быстро дать варианты правки, а не полный аудит.\n\n## Что делать\n\n1. Определи тип фрагмента: кнопка/CTA, заголовок, тост/хинт, подпись поля, подсказка-плейсхолдер,\n   тело сообщения. От типа зависит, какие правила применимы (пунктуация в тостах ≠ пунктуация в теле).\n2. Проверь фрагмент по приоритетным источникам (полные тексты, самые частые нарушения):\n   - [`../../../references/editorial-policy/screen-typography-rules.md`](../../../references/editorial-policy/screen-typography-rules.md) — неразрывные пробелы, кавычки, тире/дефис/минус\n   - [`../../../references/editorial-policy/disputed-words-rules.md`](../../../references/editorial-policy/disputed-words-rules.md) — спорные слова и штампы\n   - [`../../../references/editorial-policy/letters-rules.md`](../../../references/editorial-policy/letters-rules.md) — регистр, капс, «вы»\n   - [`../../../references/editorial-policy/numbers-currency-rules.md`](../../../references/editorial-policy/numbers-currency-rules.md) — числа, даты, валюта\n   - [`../../../references/editorial-policy/signs-rules.md`](../../../references/editorial-policy/signs-rules.md) — знаки препинания и спецсимволы\n3. Дополнительно (только разделы, которых нет в источниках выше — «Под запретом», «Простой язык»,\n   «Словарь терминов») см. [`../../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../../references/editorial-policy/svodnye-pravila-po-gruppam.md).\n   Разделы «Типографика» и «Числа» там дублируют файлы выше — не пересказывай их дважды.\n4. Дай короткий список нарушений с точной цитатой фрагмента (а не общей формулировкой совета) —\n   пользователю в интерфейсе плагина это подсвечивает проблемное место в тексте.\n5. Предложи варианты правки по запрошенному режиму:\n   - **Переформулировать** — та же мысль, другими словами, без изменения длины/тона\n   - **Сократить** — та же мысль короче, без потери смысла\n   - **Сделать четче** — убрать двусмысленность и общие слова, оставить конкретику\n   - **Сделать дружелюбнее** — смягчить тон, не теряя конкретику (см. «Тон и голос» в сводке)\n     Если режим не указан явно — предложи 2–3 варианта в разных режимах и спроси, какой ближе.\n\n## Гоучи\n\n- **Не путай «Редактор» с «Полным анализом»**: здесь не нужна оценка 0–10 и общий индекс качества —\n  это отдельный режим плагина (full-analysis-text). Если пользователь просит и оценку, и правку —\n  сначала спроси, нужен полный аудит или точечная правка.\n- **Тосты/хинты/тултипы-подписи не заканчиваются точкой**, если это одно предложение — модель\n  систематически добавляет точку по умолчанию, проверяй тип фрагмента перед финальным ответом.\n- **«Вы» со строчной буквы** даже в вежливой формулировке — не путай с орфографическим Вы из\n  официальных писем, это разные регистры.\n- Если фрагмент — кнопка подтверждения удаления/необратимого действия, формулировка должна называть\n  конкретное последствие («Удалить доверенность для ООО "Ромашка"»), а не быть общим «Да»/«Продолжить».\n- Не сокращай ради сокращения: краткость должна сохранять баланс «простота + краткость + польза»\n  (см. «Основные правила» в сводке) — если сокращение теряет нужную пользователю деталь, это не\n  победа.',
           references: [
             {
               path: "../../../references/editorial-policy/screen-typography-rules.md",
@@ -1677,7 +1681,7 @@
         },
         "full-analysis-text": {
           instructions:
-            "# Полный анализ текста по редполитике Контура\n\nАналог режима «Полный анализ» плагина «К редактор»: пользователь даёт связный текстовый\nблок целиком (не выбирает один элемент заранее), и нужна общая оценка + список замечаний по всем\nгруппам правил, а не разбор одного знака препинания.\n\n## Что делать\n\n1. Прочитай весь текст целиком и определи его тип (экран, письмо, попап, серия тостов) — это\n   влияет на применимые правила (тон робота vs Контура, пунктуация подписей vs абзацев).\n2. Проверь текст по сводному документу\n   [`../../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../../references/editorial-policy/svodnye-pravila-po-gruppam.md) —\n   это единственный источник, по которому в плагине считается индекс качества, он покрывает все\n   группы правил одним файлом.\n3. Для неоднозначных случаев (спорное слово, точное написание чужого названия, редкий формат\n   числа) уточни в специализированном источнике, а не гадай по сводке:\n   - [`../../../references/editorial-policy/disputed-words-rules.md`](../../../references/editorial-policy/disputed-words-rules.md)\n   - [`../../../references/editorial-policy/company-names-rules.md`](../../../references/editorial-policy/company-names-rules.md)\n   - [`../../../references/editorial-policy/laws-services-names-rules.md`](../../../references/editorial-policy/laws-services-names-rules.md)\n   - [`../../../references/editorial-policy/simple-words-rules.md`](../../../references/editorial-policy/simple-words-rules.md)\n   - [`../../../references/editorial-policy/osnovnye_pravila_teksta_v_interfeise.md`](../../../references/editorial-policy/osnovnye_pravila_teksta_v_interfeise.md) — базовая логика «зачем этот текст вообще нужен»\n4. Посчитай индекс качества 0–10 (ориентир по шкале плагина: 0–4 — серьёзные проблемы, 5–7 —\n   есть что доработать, 8–9 — почти готово, 10 — без замечаний) и оформи вывод:\n   - индекс + короткое обоснование\n   - список замечаний с **точной цитатой фрагмента** (не пересказом совета) и тегом группы правил\n     (типографика / простой язык / тон и голос / числа / названия / структура)\n   - при необходимости — 1–2 предложенных варианта правки на самое серьёзное замечание\n5. Если пользователь после этого просит переписать конкретный найденный фрагмент — это уже\n   задача only-editor, передай/предложи точечную правку в его логике режимов.\n\n## Гоучи\n\n- **Не занижай и не завышай индекс из вежливости** — если в тексте капс, наращения окончаний\n  («3-х дней») или страдательный залог там, где должен говорить Контур от первого лица, это\n  минимум −2 к индексу по опыту разметки; не сглаживай оценку до «в целом неплохо».\n- **Цитируй фрагмент дословно**, а не своими словами — в интерфейсе плагина подсветка проблемного\n  места работает только по точному совпадению строки с текстом на макете.\n- **Не путай «Под запретом» и «Простой язык»** как теги — капс/кавычки/наращения это типографика\n  и категорические запреты, а канцеляризмы и штампы — про упрощение синтаксиса; разные советы для\n  разных исправлений.\n- **Различай модальность «робот» vs «Контур»** прежде чем ругать текст за страдательный залог —\n  в коротких технических уведомлениях о результате действия страдательный залог допустим и это\n  не ошибка (см. «Тон и голос» в сводке), ошибка — только если так же написано объясняющее письмо.\n- Если текст — это подтверждение необратимого действия, отдельно проверь, называет ли кнопка\n  конкретное последствие, а не общее «Да» — это частое замечание, которое легко пропустить,\n  сосредоточившись только на самом тексте сообщения.",
+            "# Полный анализ текста по редполитике Контура\n\nАналог режима «Полный анализ» плагина «Просто редактор»: пользователь даёт связный текстовый\nблок целиком (не выбирает один элемент заранее), и нужна общая оценка + список замечаний по всем\nгруппам правил, а не разбор одного знака препинания.\n\n## Что делать\n\n1. Прочитай весь текст целиком и определи его тип (экран, письмо, попап, серия тостов) — это\n   влияет на применимые правила (тон робота vs Контура, пунктуация подписей vs абзацев).\n2. Проверь текст по сводному документу\n   [`../../../references/editorial-policy/svodnye-pravila-po-gruppam.md`](../../../references/editorial-policy/svodnye-pravila-po-gruppam.md) —\n   это единственный источник, по которому в плагине считается индекс качества, он покрывает все\n   группы правил одним файлом.\n3. Для неоднозначных случаев (спорное слово, точное написание чужого названия, редкий формат\n   числа) уточни в специализированном источнике, а не гадай по сводке:\n   - [`../../../references/editorial-policy/disputed-words-rules.md`](../../../references/editorial-policy/disputed-words-rules.md)\n   - [`../../../references/editorial-policy/company-names-rules.md`](../../../references/editorial-policy/company-names-rules.md)\n   - [`../../../references/editorial-policy/laws-services-names-rules.md`](../../../references/editorial-policy/laws-services-names-rules.md)\n   - [`../../../references/editorial-policy/simple-words-rules.md`](../../../references/editorial-policy/simple-words-rules.md)\n   - [`../../../references/editorial-policy/osnovnye_pravila_teksta_v_interfeise.md`](../../../references/editorial-policy/osnovnye_pravila_teksta_v_interfeise.md) — базовая логика «зачем этот текст вообще нужен»\n4. Посчитай индекс качества 0–10 (ориентир по шкале плагина: 0–4 — серьёзные проблемы, 5–7 —\n   есть что доработать, 8–9 — почти готово, 10 — без замечаний) и оформи вывод:\n   - индекс + короткое обоснование\n   - список замечаний с **точной цитатой фрагмента** (не пересказом совета) и тегом группы правил\n     (типографика / простой язык / тон и голос / числа / названия / структура)\n   - при необходимости — 1–2 предложенных варианта правки на самое серьёзное замечание\n5. Если пользователь после этого просит переписать конкретный найденный фрагмент — это уже\n   задача only-editor, передай/предложи точечную правку в его логике режимов.\n\n## Гоучи\n\n- **Не занижай и не завышай индекс из вежливости** — если в тексте капс, наращения окончаний\n  («3-х дней») или страдательный залог там, где должен говорить Контур от первого лица, это\n  минимум −2 к индексу по опыту разметки; не сглаживай оценку до «в целом неплохо».\n- **Цитируй фрагмент дословно**, а не своими словами — в интерфейсе плагина подсветка проблемного\n  места работает только по точному совпадению строки с текстом на макете.\n- **Не путай «Под запретом» и «Простой язык»** как теги — капс/кавычки/наращения это типографика\n  и категорические запреты, а канцеляризмы и штампы — про упрощение синтаксиса; разные советы для\n  разных исправлений.\n- **Различай модальность «робот» vs «Контур»** прежде чем ругать текст за страдательный залог —\n  в коротких технических уведомлениях о результате действия страдательный залог допустим и это\n  не ошибка (см. «Тон и голос» в сводке), ошибка — только если так же написано объясняющее письмо.\n- Если текст — это подтверждение необратимого действия, отдельно проверь, называет ли кнопка\n  конкретное последствие, а не общее «Да» — это частое замечание, которое легко пропустить,\n  сосредоточившись только на самом тексте сообщения.",
           references: [
             {
               path: "../../../references/editorial-policy/svodnye-pravila-po-gruppam.md",
@@ -1892,7 +1896,6 @@
         bridge.send("save-cache", resultCache);
       }
 
-      let settingsSaveTimer = null;
       let explicitSaveCount = 0;
       let settingsReady = false;
 
@@ -3334,14 +3337,6 @@
         saveSettings();
       }
 
-      function saveSettingsDebounced() {
-        if (settingsSaveTimer) clearTimeout(settingsSaveTimer);
-        settingsSaveTimer = setTimeout(() => {
-          settingsSaveTimer = null;
-          saveSettings();
-        }, 400);
-      }
-
       function escapeHtml(text) {
         return String(text === null || text === undefined ? "" : text)
           .replaceAll("&", "&amp;")
@@ -3763,16 +3758,12 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
                 <option value="openai" ${state.settings.endpoint === "openai" ? "selected" : ""}>ChatGPT</option>
                 <option value="custom" ${state.settings.endpoint === "custom" ? "selected" : ""}>Свой</option>
               </select>
+              ${
+                state.settings.endpoint === "custom"
+                  ? `<input class="text-input" id="apiUrlInput" type="text" value="${escapeHtml(state.settings.apiUrl || "")}" placeholder="https://..." autocomplete="off" />`
+                  : ""
+              }
             </div>
-            ${
-              state.settings.endpoint === "custom"
-                ? `
-            <div class="field">
-              <input class="text-input" id="apiUrlInput" type="text" value="${escapeHtml(state.settings.apiUrl || "")}" placeholder="https://..." />
-            </div>
-            `
-                : ""
-            }
             <div class="field">
               <label class="field-label" for="apiTokenInput">Токен</label>
               ${
@@ -3784,7 +3775,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
               </div>
               `
                   : `
-              <input class="key-input" id="apiTokenInput" type="password" value="${escapeHtml(currentApiToken())}" placeholder="sk-..." minlength="${MIN_API_TOKEN_LENGTH}" aria-invalid="${Boolean(sanitizeApiKey(currentApiToken()) && apiTokenError())}" />
+              <input class="key-input" id="apiTokenInput" type="password" value="${escapeHtml(currentApiToken())}" placeholder="sk-..." minlength="${MIN_API_TOKEN_LENGTH}" aria-invalid="${Boolean(sanitizeApiKey(currentApiToken()) && apiTokenError())}" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore data-form-type="other" />
               `
               }
             </div>
@@ -4550,7 +4541,6 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             state.settings.endpoint = endpointSelect.value;
             ensureValidModel();
             state.apiStatus = "idle";
-            saveSettingsDebounced();
             render();
           };
         }
@@ -4559,7 +4549,6 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         if (apiUrlInput) {
           apiUrlInput.oninput = () => {
             state.settings.apiUrl = apiUrlInput.value;
-            saveSettingsDebounced();
             updateSettingsActionButtons();
           };
         }
@@ -4578,13 +4567,11 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         if (apiTokenInput) {
           apiTokenInput.oninput = () => {
             setCurrentApiToken(apiTokenInput.value);
-            saveSettingsDebounced();
             updateSettingsActionButtons();
           };
           apiTokenInput.onchange = apiTokenInput.oninput;
           apiTokenInput.onblur = () => {
             setCurrentApiToken(sanitizeApiKey(apiTokenInput.value));
-            saveSettingsDebounced();
             render();
           };
         }
@@ -4593,7 +4580,6 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         if (modelSelect) {
           modelSelect.onchange = () => {
             state.settings.model = modelSelect.value;
-            saveSettingsDebounced();
           };
         }
 
@@ -4601,7 +4587,6 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         if (explainInput) {
           explainInput.onchange = () => {
             state.settings.explainVariants = explainInput.checked;
-            saveSettingsDebounced();
           };
         }
 
@@ -4609,7 +4594,6 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         if (neighbourInput) {
           neighbourInput.onchange = () => {
             state.settings.analyzeNeighbour = neighbourInput.checked;
-            saveSettingsDebounced();
           };
         }
 
@@ -4617,7 +4601,6 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         if (countInput) {
           countInput.onchange = () => {
             state.settings.variantsCount = Math.max(1, Math.min(5, Number(countInput.value || 3)));
-            saveSettingsDebounced();
           };
         }
 

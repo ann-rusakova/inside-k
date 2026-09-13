@@ -12,7 +12,7 @@
   Сборщик встраивает её в Figma-плагин; вручную правятся только исходники.
 - **11 скиллов**, каждый — одна задача с явными триггер-фразами и границами «когда НЕ применять»,
   чтобы agent не путал соседние сценарии.
-- **Плагины Figma**, начиная с [`figma-plugins/k-editor`](figma-plugins/k-editor) — та же
+- **Плагины Figma**, начиная с [`figma-plugins/simple-editor`](figma-plugins/simple-editor) — та же
   редполитика прямо в Figma, без переключения в чат.
 
 ```
@@ -28,10 +28,10 @@ you: "Оцени вот этот текст экрана по редполити
    «оцени текст по редполитике») — агент сам подхватит нужный скилл по описанию в таблице ниже.
    Явно называть скилл не обязательно.
 3. Если нужна точечная редактура текста в макете Figma без переключения в чат — используйте
-   Figma-плагин [«К редактор»](#плагины), он работает по той же редполитике.
+   Figma-плагин [«Просто редактор»](#плагины), он работает по той же редполитике.
 4. Меняете скилл или редполитику сами — прочитайте [AGENTS.md](AGENTS.md) о конвенциях, после
    правки `references/editorial-policy/` или скиллов `only-editor`/`full-analysis-text`
-   запустите `npm run build:k-editor`, чтобы обновить базу знаний Figma-плагина (см.
+   запустите `npm run build:simple-editor`, чтобы обновить базу знаний Figma-плагина (см.
    [«Сборка и форматирование»](#сборка-и-форматирование)).
 
 ## Скиллы
@@ -77,19 +77,19 @@ Cursor также поддерживает `.agents/skills/` напрямую: [
 
 ## Плагины
 
-[`figma-plugins/k-editor`](figma-plugins/k-editor) — «К редактор» (K Editor), Figma-плагин для
+[`figma-plugins/simple-editor`](figma-plugins/simple-editor) — «Просто редактор» (Simple Editor), Figma-плагин для
 UX-редактуры текста прямо в макете: полный анализ текста (индекс качества 0–10) и точечный
 редактор одного фрагмента (переформулировать/сократить/четче/дружелюбнее), по тем же правилам,
 что и скиллы `full-analysis-text`/`only-editor`.
 
 - **Установка (локально):** Figma Desktop → `Plugins` → `Development` →
-  `Import plugin from manifest...` → выбрать `figma-plugins/k-editor/manifest.json`.
+  `Import plugin from manifest...` → выбрать `figma-plugins/simple-editor/manifest.json`.
   Если плагин уже был импортирован из прежней папки `plugins/simple-editor/` (переехала в
-  `figma-plugins/k-editor/`) — удалите старую запись в `Development` и импортируйте manifest
+  `figma-plugins/simple-editor/`) — удалите старую запись в `Development` и импортируйте manifest
   заново по новому пути, иначе Figma продолжит запускать устаревшую закешированную сборку.
 - **База знаний** — [`references/editorial-policy/`](references/editorial-policy) (реестр источников —
   [`references/sources.json`](references/sources.json)), вшивается в `ui.html` сборщиком
-  `tools/update-k-editor.js` командой `npm run build:k-editor` (из корня) —
+  `tools/update-simple-editor.js` командой `npm run build:simple-editor` (из корня) —
   запускать после правки файлов в `references/editorial-policy/`, `sources.json` или двух скиллов ниже.
 - **Инструкции режимов** — напрямую из
   [only-editor/SKILL.md](.agents/skills/only-editor/SKILL.md) для редактора и вариантов правки,
@@ -116,7 +116,7 @@ Prettier — зависимость только для разработки; п
 Собрать базу знаний Figma-плагина из корня репозитория:
 
 ```bash
-npm run build:k-editor
+npm run build:simple-editor
 ```
 
 Команда встраивает скиллы и редполитику в `ui.html`, проверяет манифест и синтаксис кода
@@ -131,11 +131,11 @@ npm run format:check  # проверка форматирования без и�
 ```
 
 Настройки Prettier — в `.prettierrc`, исключения — в `.prettierignore`.
-Сборщик автоматически форматирует весь `figma-plugins/k-editor/ui.html` после встраивания
+Сборщик автоматически форматирует весь `figma-plugins/simple-editor/ui.html` после встраивания
 базы знаний. Файл также обрабатывается командой `npm run format`.
 После изменения или форматирования любого скилла или справочника
-запускайте `npm run build:k-editor`.
-Проверка актуальности сборки: `node tools/update-k-editor.js --check`.
+запускайте `npm run build:simple-editor`.
+Проверка актуальности сборки: `node tools/update-simple-editor.js --check`.
 Синтаксис кода и подключение скиллов проверяются этим же скриптом до записи результата.
 
 ## Структура репозитория
@@ -153,7 +153,7 @@ npm run format:check  # проверка форматирования без и�
 | `TONE-OF-VOICE.md`    | Голос и тон коммуникации в текстах Контура: как говорим с клиентом, какие слова используем.     |
 | `SECURITY.md`         | Политика безопасности: как сообщить об уязвимости, работа с API-ключами, scope.                |
 | `DESIGN.md`           | Дизайн-система Figma-плагина: CSS-переменные, компоненты, чеклист перед PR с UI.                |
-| `package.json`        | Единственный npm-манифест репозитория; скрипт `build:k-editor` собирает базу знаний плагина.    |
+| `package.json`        | Единственный npm-манифест репозитория; скрипт `build:simple-editor` собирает базу знаний плагина.    |
 | `.prettierrc`         | Настройки Prettier: отступы, кавычки, переносы строк.                                          |
 | `.prettierignore`     | Исключения форматирования: зависимости и lock-файл.                                            |
 | `package-lock.json`   | Закреплённое дерево зависимостей инструментов разработки.                                      |
@@ -204,7 +204,7 @@ npm run format:check  # проверка форматирования без и�
 ### `references/` — общая база знаний (общий источник)
 
 Единственный источник правил; на него ссылаются скиллы `only-editor`/`full-analysis-text` и
-собирает Figma-плагин через `tools/update-k-editor.js`.
+собирает Figma-плагин через `tools/update-simple-editor.js`.
 
 | Файл           | Описание                                                                                            |
 | --------------- | -------------------------------------------------------------------------------------------------- |
@@ -225,7 +225,7 @@ npm run format:check  # проверка форматирования без и�
 | `company-names-rules.md`                    | Написание названий компаний.                                                         |
 | `laws-services-names-rules.md`              | Написание названий законов и сервисов.                                               |
 
-### `figma-plugins/k-editor/` — Figma-плагин «К редактор»
+### `figma-plugins/simple-editor/` — Figma-плагин «Просто редактор»
 
 Содержит только код плагина; данные и сборка вынесены наружу (`references/`, `tools/`).
 
@@ -239,7 +239,7 @@ npm run format:check  # проверка форматирования без и�
 
 | Файл                 | Описание                                                                                                                        |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `update-k-editor.js` | Собирает базу знаний Figma-плагина из `.agents/skills/` и `references/`, проверяет манифест, код и подключение скиллов. Запуск: `npm run build:k-editor`; `--check` — без записи. |
+| `update-simple-editor.js` | Собирает базу знаний Figma-плагина из `.agents/skills/` и `references/`, проверяет манифест, код и подключение скиллов. Запуск: `npm run build:simple-editor`; `--check` — без записи. |
 
 ### `.claude/` — конфигурация Claude Code
 

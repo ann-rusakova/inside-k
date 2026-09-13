@@ -11,15 +11,15 @@
   названия), реестр источников — `references/sources.json` (на уровень выше). Единственный
   источник: на них ссылаются скиллы `only-editor`/`full-analysis-text`
   (по пути `../../../references/editorial-policy/...`) и Figma-плагины через сборщик
-  `tools/update-k-editor.js`, который читает их напрямую и вшивает в
-  `figma-plugins/k-editor/ui.html`. Не дублируй эти файлы — добавляй новые правила только сюда,
-  `npm run build:k-editor` (из корня) подхватит их автоматически.
-- `figma-plugins/k-editor/` — Figma-плагин «К редактор» (UX-редактура текста в макете,
+  `tools/update-simple-editor.js`, который читает их напрямую и вшивает в
+  `figma-plugins/simple-editor/ui.html`. Не дублируй эти файлы — добавляй новые правила только сюда,
+  `npm run build:simple-editor` (из корня) подхватит их автоматически.
+- `figma-plugins/simple-editor/` — Figma-плагин «Просто редактор» (UX-редактура текста в макете,
   Claude/OpenAI API). Содержит только `code.js`/`manifest.json`/`ui.html` — ни данных, ни сборки
   внутри папки нет, всё вынесено наружу (`references/`, `tools/`). Документация — в
   [README.md](README.md#плагины), отдельного README в папке плагина нет.
-- `tools/update-k-editor.js` — сборщик базы знаний Figma-плагина. Запускать
-  `npm run build:k-editor` после изменения любого скилла или справочника, читаемого плагином.
+- `tools/update-simple-editor.js` — сборщик базы знаний Figma-плагина. Запускать
+  `npm run build:simple-editor` после изменения любого скилла или справочника, читаемого плагином.
   `--check` проверяет актуальность без записи.
 - `SOUL.md` — тон и принципы работы отдела, `TONE-OF-VOICE.md` — голос и тон коммуникации в
   текстах Контура; ни один из файлов не дублирует технические правила отсюда.
@@ -42,9 +42,9 @@
 `only-editor`, `full-analysis-text`, `figma-spec-notes`, `brainstorm-experiments-existing`,
 `brainstorm-experiments-new`, `opportunity-solution-tree`, `objective-prompt-rewriter`.
 
-## Плагины (`figma-plugins/k-editor`)
+## Плагины (`figma-plugins/simple-editor`)
 
-- Сборка базы знаний в UI: `npm run build:k-editor` из корня — обязательно после правки файлов в
+- Сборка базы знаний в UI: `npm run build:simple-editor` из корня — обязательно после правки файлов в
   `references/editorial-policy/`, `.agents/skills/only-editor/SKILL.md` или
   `.agents/skills/full-analysis-text/SKILL.md`. Сборщик вшивает инструкции скиллов в промпты
   соответствующих режимов, а редполитику — также в экран «Правила».
