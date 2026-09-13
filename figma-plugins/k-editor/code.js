@@ -230,11 +230,21 @@ async function loadCache() {
 }
 
 figma.on("selectionchange", async () => {
-  const payload = await getSelectionPayload();
-  figma.ui.postMessage({
-    type: "selection-updated",
-    payload,
-  });
+  try {
+    const payload = await getSelectionPayload();
+    figma.ui.postMessage({
+      type: "selection-updated",
+      payload,
+    });
+  } catch (error) {
+    console.error("selectionchange failed", error);
+    figma.ui.postMessage({
+      type: "action-error",
+      payload: {
+        message: `Не удалось обработать выбор слоя: ${error && error.message ? error.message : "неизвестная ошибка"}`,
+      },
+    });
+  }
 });
 
 figma.ui.onmessage = async (msg) => {
@@ -242,11 +252,21 @@ figma.ui.onmessage = async (msg) => {
 
   switch (msg.type) {
     case "get-selection": {
-      const payload = await getSelectionPayload();
-      figma.ui.postMessage({
-        type: "selection-updated",
-        payload,
-      });
+      try {
+        const payload = await getSelectionPayload();
+        figma.ui.postMessage({
+          type: "selection-updated",
+          payload,
+        });
+      } catch (error) {
+        console.error("get-selection failed", error);
+        figma.ui.postMessage({
+          type: "action-error",
+          payload: {
+            message: `Не удалось прочитать выбор слоя: ${error && error.message ? error.message : "неизвестная ошибка"}`,
+          },
+        });
+      }
       break;
     }
     case "apply-variant": {

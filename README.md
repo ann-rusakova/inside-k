@@ -84,6 +84,9 @@ UX-редактуры текста прямо в макете: полный ан
 
 - **Установка (локально):** Figma Desktop → `Plugins` → `Development` →
   `Import plugin from manifest...` → выбрать `figma-plugins/k-editor/manifest.json`.
+  Если плагин уже был импортирован из прежней папки `plugins/simple-editor/` (переехала в
+  `figma-plugins/k-editor/`) — удалите старую запись в `Development` и импортируйте manifest
+  заново по новому пути, иначе Figma продолжит запускать устаревшую закешированную сборку.
 - **База знаний** — [`references/editorial-policy/`](references/editorial-policy) (реестр источников —
   [`references/sources.json`](references/sources.json)), вшивается в `ui.html` сборщиком
   `tools/update-k-editor.js` командой `npm run build:k-editor` (из корня) —

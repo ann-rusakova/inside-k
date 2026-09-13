@@ -2142,10 +2142,8 @@
           render();
         }
         if (data.type === "settings-saved") {
-          if (explicitSaveCount > 0) {
-            explicitSaveCount -= 1;
-            toast("Настройки сохранены", "success");
-          }
+          explicitSaveCount = Math.max(0, explicitSaveCount - 1);
+          toast("Настройки сохранены", "success");
         }
         if (data.type === "variant-applied") {
           const { nodeId, text } = data.payload || {};
@@ -3764,8 +3762,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             }
             <div class="field">
               <label class="field-label" for="apiTokenInput">Токен</label>
-              <input class="key-input" id="apiTokenInput" type="password" value="${escapeHtml(currentApiToken())}" placeholder="sk-..." minlength="${MIN_API_TOKEN_LENGTH}" aria-describedby="apiTokenHint" aria-invalid="${Boolean(sanitizeApiKey(currentApiToken()) && apiTokenError())}" />
-              <div class="section-caption" id="apiTokenHint" aria-live="polite">${escapeHtml(sanitizeApiKey(currentApiToken()) && apiTokenError() ? apiTokenError() : `Минимум ${MIN_API_TOKEN_LENGTH} символов без пробелов`)}</div>
+              <input class="key-input" id="apiTokenInput" type="password" value="${escapeHtml(currentApiToken())}" placeholder="sk-..." minlength="${MIN_API_TOKEN_LENGTH}" aria-invalid="${Boolean(sanitizeApiKey(currentApiToken()) && apiTokenError())}" />
             </div>
             <div class="field">
               <label class="field-label" for="modelSelect">Модель</label>
