@@ -4199,10 +4199,10 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
                 const issues = Array.isArray(block.issues) ? block.issues : [];
                 return `
                   <div class="frame-block">
-                    <div class="frame-block-header">
+                    <button class="frame-block-header" data-select-idx="${idx}" type="button" title="Выделить слой в макете">
                       <span class="frame-block-text">${escapeHtml(clipText(item.text, 90))}</span>
                       <span class="frame-block-score tone-${scoreTone(blockScore)}">${blockScore}/10</span>
-                    </div>
+                    </button>
                     <div class="frame-block-body">
                       ${resultCardHtml(item.text, block.tags, blockScore, false, issues)}
                       ${
@@ -4428,6 +4428,14 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         const frameEditorBtn = document.getElementById("frameEditorBtn");
         if (frameEditorBtn)
           frameEditorBtn.onclick = () => runExclusive(() => startFrameAnalysis("editor"));
+
+        document.querySelectorAll("[data-select-idx]").forEach((el) => {
+          el.onclick = () => {
+            const idx = Number(el.dataset.selectIdx);
+            const item = state.frameTexts[idx];
+            if (item && item.id) bridge.send("select-node", { nodeId: item.id });
+          };
+        });
 
         document.querySelectorAll("[data-block-mode]").forEach((el) => {
           el.onclick = () => {

@@ -22,7 +22,7 @@ UX-исследований и редактуры Контура. Нет сер�
 
 - что нашли и как воспроизвести;
 - затронутый компонент (`figma-plugins/k-editor/`, `tools/`, `.agents/skills/`,
-  `plugins/inside-k/`, `.agents/plugins/marketplace.json`, `.claude/settings.json`, `.claude/hooks/`);
+  `.claude/settings.json`, `.claude/hooks/`);
 - оценку impact (утечка ключа, произвольный сетевой запрос из плагина, инъекция через
   содержимое скилла).
 
@@ -39,8 +39,6 @@ UX-исследований и редактуры Контура. Нет сер�
 - сборщик `tools/update-k-editor.js` — читает только локальные файлы
   репозитория, сети не касается;
 - скиллы в `.agents/skills/` — инструкции для агента, не исполняемый код;
-- `plugins/inside-k/` и `.agents/plugins/marketplace.json` — пакет скиллов и каталог Codex;
-  пакет содержит копии методик и справочников для распространения, без API-ключей;
 - `.claude/skills` и `.cursor/skills` — ссылки на исходники скиллов;
 - `.claude/settings.json` — подключение хуков и allowlist разрешённых команд;
 - `.claude/hooks/remind-content-build.js` — напоминание о сборке базы знаний.

@@ -18,14 +18,11 @@
   Claude/OpenAI API). Содержит только `code.js`/`manifest.json`/`ui.html` — ни данных, ни сборки
   внутри папки нет, всё вынесено наружу (`references/`, `tools/`). Документация — в
   [README.md](README.md#плагины), отдельного README в папке плагина нет.
-- `plugins/inside-k/` — распространяемый пакет Codex. `skills/` и `references/` внутри него —
-  генерируемые копии для установки вне репозитория, вручную не редактировать. Источник правды
-  остаётся в `.agents/skills/` и корневой `references/`; адаптацию ссылок делает сборщик.
-- `.agents/plugins/marketplace.json` — каталог Codex, указывает на `plugins/inside-k/`.
-- `tools/update-k-editor.js` — единый сборщик Figma-плагина и пакета скиллов. Запускать
-  `npm run update:plugin` после изменения любого скилла или справочника. Генерируемый пакет
-  коммитится вместе с исходниками. `--check` проверяет актуальность без записи.
-- `SOUL.md` — тон и принципы работы отдела, не дублирует технические правила отсюда.
+- `tools/update-k-editor.js` — сборщик базы знаний Figma-плагина. Запускать
+  `npm run build:k-editor` после изменения любого скилла или справочника, читаемого плагином.
+  `--check` проверяет актуальность без записи.
+- `SOUL.md` — тон и принципы работы отдела, `TONE-OF-VOICE.md` — голос и тон коммуникации в
+  текстах Контура; ни один из файлов не дублирует технические правила отсюда.
 
 ## Скиллы
 
@@ -42,7 +39,8 @@
   (см. `references/editorial-policy/` ниже), не копия внутри каждого скилла.
 
 Действующие скиллы: `design-guide`, `jtbd`, `qualitative-analysis-rules`, `survey`,
-`only-editor`, `full-analysis-text`.
+`only-editor`, `full-analysis-text`, `figma-spec-notes`, `brainstorm-experiments-existing`,
+`brainstorm-experiments-new`, `opportunity-solution-tree`, `objective-prompt-rewriter`.
 
 ## Плагины (`figma-plugins/k-editor`)
 
