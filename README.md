@@ -24,7 +24,7 @@
 3. Чтобы проверить текст в макете, не переходя в чат, установите [Figma-плагин](#плагины).
 4. Если правите скилл или редполитику, прочитайте конвенции в [AGENTS.md](AGENTS.md). После правки
    `references/editorial-policy/` или скиллов `only-editor` и `full-analysis-text` запустите
-   `npm run update:simple-editor`, иначе плагин продолжит работать по старым правилам.
+   `npm run build:simple-editor`, иначе плагин продолжит работать по старым правилам.
 
 ```bash
 git clone https://github.com/ann-rusakova/inside-k.git
@@ -174,12 +174,12 @@ claude   # или откройте папку в Cursor или Codex
 Prettier для разработки, плагину npm-пакеты не нужны.
 
 ```bash
-npm run update:simple-editor                    # собрать базу знаний плагина
+npm run build:simple-editor                    # собрать базу знаний плагина
 node tools/update-simple-editor.js --check     # проверить, что сборка актуальна, без записи
 npm run format                                 # отформатировать файлы по .prettierrc
 ```
 
-`update:simple-editor` встраивает скиллы и редполитику в `ui.html`, проверяет манифест, синтаксис кода
+`build:simple-editor` встраивает скиллы и редполитику в `ui.html`, проверяет манифест, синтаксис кода
 и подключение скиллов, затем форматирует `ui.html` через Prettier. При ошибке скрипт останавливается
 и ничего не записывает.
 
@@ -200,7 +200,7 @@ npm run format                                 # отформатировать 
 | `TONE-OF-VOICE.md`                      | Голос и тон текстов Контура                                                                            |
 | `SECURITY.md`                           | Как сообщить об уязвимости, работа с API-ключами, scope                                                |
 | `DESIGN.md`                             | Дизайн-система плагина: CSS-переменные, компоненты, чеклист перед PR с UI                              |
-| `package.json`, `package-lock.json`     | Скрипты `update:simple-editor` и `format`, закреплённая версия Prettier                                 |
+| `package.json`, `package-lock.json`     | Скрипты `build:simple-editor` и `format`, закреплённая версия Prettier                                 |
 | `.prettierrc`, `.prettierignore`        | Настройки Prettier; из форматирования исключены зависимости, lock-файл и симлинки скиллов              |
 | `.gitignore`                            | Исключения: macOS, `node_modules/`, `.env*`, файлы IDE                                                 |
 | `.agents/skills/<name>/`                | Исходники скиллов. У `design-guide` есть `examples/` и `references/`, у `jtbd` — `references/`         |
