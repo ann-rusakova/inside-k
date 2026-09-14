@@ -16,7 +16,7 @@ Cursor и Figma-плагин «Просто редактор». Отдельно
   Claude API или OpenAI API. В папке три файла: `code.js`, `manifest.json`, `ui.html`. Данные лежат в
   `references/`, сборщик — в `tools/`. Документация плагина — в [README.md](README.md#плагины).
 - `tools/update-simple-editor.js` — сборщик базы знаний плагина. Запускается командой
-  `npm run build:simple-editor`, флаг `--check` проверяет актуальность сборки без записи.
+  `npm run update:simple-editor`, флаг `--check` проверяет актуальность сборки без записи.
 - `SOUL.md` объясняет, зачем отделу скиллы. `TONE-OF-VOICE.md` описывает голос и тон текстов
   Контура. Технических правил в них нет.
 
@@ -37,7 +37,7 @@ Cursor и Figma-плагин «Просто редактор». Отдельно
 
 ## Плагин `figma-plugins/simple-editor`
 
-- Запусти `npm run build:simple-editor` из корня после правки `references/editorial-policy/`,
+- Запусти `npm run update:simple-editor` из корня после правки `references/editorial-policy/`,
   `references/sources.json`, `.agents/skills/only-editor/SKILL.md` или
   `.agents/skills/full-analysis-text/SKILL.md`. Сборщик вшивает инструкции скиллов в промпты режимов,
   а редполитику ещё и в экран «Правила».

@@ -4,7 +4,7 @@
   "private": true,
   "description": "UX-исследования и редактура Контура: скиллы + Figma-плагины",
   "scripts": {
-    "build:simple-editor": "node tools/update-simple-editor.js",
+    "update:simple-editor": "node tools/update-simple-editor.js",
     "format": "prettier --write ."
   },
   "engines": {

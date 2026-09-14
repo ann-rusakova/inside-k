@@ -25,7 +25,7 @@ try {
     console.log(
       JSON.stringify({
         systemMessage:
-          "Скилл или справочник изменён — запустите npm run build:simple-editor из корня, чтобы обновить Figma-плагин.",
+          "Скилл или справочник изменён — запустите npm run update:simple-editor из корня, чтобы обновить Figma-плагин.",
       })
     );
   }

@@ -73,7 +73,7 @@
 
 - В Figma по умолчанию выбран Anthropic, для анализа нужен API-ключ. Вне Figma предпросмотр работает
   с mock-анализом, при этом шрифты могут загружаться с `s.kontur.ru`.
-- Сборка `npm run build:simple-editor` не отправляет сетевых запросов: база знаний читается из
+- Сборка `npm run update:simple-editor` не отправляет сетевых запросов: база знаний читается из
   `.agents/skills/` и `references/` на диске.
 - Хук `.claude/hooks/remind-content-build.js` из `.claude/settings.json` печатает напоминание о
   сборке. Как любой command hook, он запускает команду оболочки, и список разрешённых команд Bash
@@ -84,7 +84,7 @@
 Версия Prettier в `devDependencies` закреплена точно, дерево зависимостей фиксирует
 `package-lock.json`. Устанавливайте зависимости через `npm ci`, известные уязвимости проверяйте
 через `npm audit`. После обновления Prettier запустите `npm run format` и
-`npm run build:simple-editor`.
+`npm run update:simple-editor`.
 
 Плагин не использует npm-пакеты во время работы: `code.js` и `ui.html` выполняются в песочнице Figma
 без Node.js.

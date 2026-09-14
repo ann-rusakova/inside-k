@@ -91,7 +91,7 @@
 - [ ] Иконка добавлена в `ICONS`, а не отдельным файлом
 - [ ] Анимация использует `--dur-fast` или `--dur-base` и отключается при `prefers-reduced-motion`
 - [ ] Плагин проверен в Figma через `Import plugin from manifest...`, а не только в браузерном mock-режиме
-- [ ] После правки базы знаний запущен `npm run build:simple-editor`
+- [ ] После правки базы знаний запущен `npm run update:simple-editor`
 
 ## Связанные файлы
 

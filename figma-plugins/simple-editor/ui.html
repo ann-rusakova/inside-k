@@ -3886,7 +3886,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
       function rulesView() {
         const sections = parseBundledRules(BUNDLED_RULES);
         if (!sections.length) {
-          return `<div class="screen padded"><div class="section-caption">Правила ещё не вшиты. Запустите npm run build:bundle</div></div>`;
+          return `<div class="screen padded"><div class="section-caption">Правила ещё не вшиты. Запустите npm run update:bundle</div></div>`;
         }
         return `
         <div class="screen padded rules">

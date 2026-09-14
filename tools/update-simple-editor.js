@@ -140,7 +140,7 @@ async function main() {
 
   if (process.argv.includes("--check")) {
     if (html !== next) {
-      throw new Error("База знаний устарела. Запустите npm run build:simple-editor.");
+      throw new Error("База знаний устарела. Запустите npm run update:simple-editor.");
     }
   } else if (html !== next) {
     fs.writeFileSync(UI, next);
