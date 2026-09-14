@@ -1,60 +1,53 @@
 # Inside K
 
-Репозиторий отдела UX-исследований и редактуры Контура: сборник скиллов для Claude/Codex/Cursor
-и Figma-плагинов для UX-редактуры текстов, а не самостоятельное приложение.
+Репозиторий отдела UX-исследований и редактуры Контура. Здесь лежат скиллы для Claude Code, Codex и
+Cursor и Figma-плагин «Просто редактор». Отдельного приложения нет.
 
 ## Структура
 
-- `.agents/skills/` — источник правды для скиллов. `.claude/skills` и `.cursor/skills` —
-  симлинки на `../.agents/skills`, редактируй только оригинал в `.agents/`.
-- `references/editorial-policy/` — общие файлы редполитики Контура (типографика, спорные слова, числа,
-  названия), реестр источников — `references/sources.json` (на уровень выше). Единственный
-  источник: на них ссылаются скиллы `only-editor`/`full-analysis-text`
-  (по пути `../../../references/editorial-policy/...`) и Figma-плагины через сборщик
-  `tools/update-simple-editor.js`, который читает их напрямую и вшивает в
-  `figma-plugins/simple-editor/ui.html`. Не дублируй эти файлы — добавляй новые правила только сюда,
-  `npm run build:simple-editor` (из корня) подхватит их автоматически.
-- `figma-plugins/simple-editor/` — Figma-плагин «Просто редактор» (UX-редактура текста в макете,
-  Claude/OpenAI API). Содержит только `code.js`/`manifest.json`/`ui.html` — ни данных, ни сборки
-  внутри папки нет, всё вынесено наружу (`references/`, `tools/`). Документация — в
-  [README.md](README.md#плагины), отдельного README в папке плагина нет.
-- `tools/update-simple-editor.js` — сборщик базы знаний Figma-плагина. Запускать
-  `npm run build:simple-editor` после изменения любого скилла или справочника, читаемого плагином.
-  `--check` проверяет актуальность без записи.
-- `SOUL.md` — тон и принципы работы отдела, `TONE-OF-VOICE.md` — голос и тон коммуникации в
-  текстах Контура; ни один из файлов не дублирует технические правила отсюда.
+- `.agents/skills/` — исходники скиллов. `.claude/skills` и `.cursor/skills` — симлинки на
+  `../.agents/skills`. Правь только `.agents/`.
+- `references/editorial-policy/` — правила редполитики Контура по типографике, словам, числам и названиям.
+  Реестр источников — `references/sources.json`. Скиллы `only-editor` и `full-analysis-text`
+  ссылаются на эти файлы по пути `../../../references/editorial-policy/...`, сборщик
+  `tools/update-simple-editor.js` вшивает их в `figma-plugins/simple-editor/ui.html`. Новые правила
+  добавляй только сюда, копии в скиллах не заводи.
+- `figma-plugins/simple-editor/` — Figma-плагин «Просто редактор» для редактуры текста в макете через
+  Claude API или OpenAI API. В папке три файла: `code.js`, `manifest.json`, `ui.html`. Данные лежат в
+  `references/`, сборщик — в `tools/`. Документация плагина — в [README.md](README.md#плагины).
+- `tools/update-simple-editor.js` — сборщик базы знаний плагина. Запускается командой
+  `npm run build:simple-editor`, флаг `--check` проверяет актуальность сборки без записи.
+- `SOUL.md` объясняет, зачем отделу скиллы. `TONE-OF-VOICE.md` описывает голос и тон текстов
+  Контура. Технических правил в них нет.
 
 ## Скиллы
 
-Одна папка `.agents/skills/<name>/` = один `SKILL.md` (обязателен, без него скилл не грузится) +
-опционально `references/`, `examples/`, `scripts/`, `assets/`.
+Скилл — папка `.agents/skills/<name>/` с обязательным `SKILL.md`. Без него скилл не загрузится.
+Рядом можно положить `references/`, `examples/`, `scripts/`, `assets/`.
 
-- `name:` во фронтматтере должен совпадать с именем папки.
-- `description:` пишется **для модели**, не для человека: явные триггер-фразы (рус + англ) и
-  явное «НЕ используй для…», отделяющее скилл от соседних (см. существующие скиллы как образец).
-- Один скилл — одна задача/категория. Если описание тянет в две стороны — это два скилла.
-- Не переписывай в SKILL.md то, что модель и так знает — только специфика Контура/отдела и
-  секция «Гоучи» (Gotchas): реальные грабли из практики, самый ценный раздел скилла.
-- Общие справочные материалы, нужные нескольким скиллам, — в `references/` в корне репозитория
-  (см. `references/editorial-policy/` ниже), не копия внутри каждого скилла.
+- `name:` во фронтматтере совпадает с именем папки.
+- `description:` пишется для модели. В нём триггер-фразы на русском и английском и явное «НЕ
+  используй для…», чтобы модель отличала скилл от соседних. Образец — существующие скиллы.
+- Один скилл решает одну задачу. Если описание тянет в две стороны, раздели скилл на два.
+- Не пересказывай в `SKILL.md` то, что модель знает сама. Пиши специфику Контура и отдела и раздел
+  «Гоучи» (Gotchas) с ошибками, на которые отдел уже натыкался на практике.
+- Материалы, нужные нескольким скиллам, клади в корневой `references/`.
 
-Действующие скиллы: `design-guide`, `jtbd`, `qualitative-analysis-rules`, `survey`,
-`only-editor`, `full-analysis-text`, `figma-spec-notes`, `brainstorm-experiments-existing`,
-`brainstorm-experiments-new`, `opportunity-solution-tree`, `objective-prompt-rewriter`.
+Сейчас в репозитории 11 скиллов, их назначение описано в [README.md](README.md#скиллы).
 
-## Плагины (`figma-plugins/simple-editor`)
+## Плагин `figma-plugins/simple-editor`
 
-- Сборка базы знаний в UI: `npm run build:simple-editor` из корня — обязательно после правки файлов в
-  `references/editorial-policy/`, `.agents/skills/only-editor/SKILL.md` или
-  `.agents/skills/full-analysis-text/SKILL.md`. Сборщик вшивает инструкции скиллов в промпты
-  соответствующих режимов, а редполитику — также в экран «Правила».
-- Единый реестр источников — `references/sources.json`, не дублируй список руками.
-- Ключи API (Anthropic/OpenAI) — только в `figma.clientStorage` пользователя, никогда не
-  коммитить в репозиторий.
+- Запусти `npm run build:simple-editor` из корня после правки `references/editorial-policy/`,
+  `references/sources.json`, `.agents/skills/only-editor/SKILL.md` или
+  `.agents/skills/full-analysis-text/SKILL.md`. Сборщик вшивает инструкции скиллов в промпты режимов,
+  а редполитику ещё и в экран «Правила».
+- Список источников держи только в `references/sources.json`.
+- API-ключи Anthropic и OpenAI хранятся в `figma.clientStorage` пользователя. В репозиторий их не
+  коммить.
 
 ## Границы
 
-- Не трогать `node_modules/`, `.env*` — они в `.gitignore`.
-- `manifest.json` плагина: `networkAccess.allowedDomains` должен перечислять все домены, куда
-  реально ходит код — не добавляй домены «про запас».
-- Коммиты — conventional commits (`feat:`, `fix:`, `docs:`, `refactor:`).
+- Не трогай `node_modules/` и `.env*`, они в `.gitignore`.
+- В `manifest.json` плагина `networkAccess.allowedDomains` перечисляет только домены, к которым код
+  обращается. Домены на будущее не добавляй.
+- Коммиты оформляй по conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`.

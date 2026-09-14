@@ -555,7 +555,7 @@
       .select-input {
         appearance: none;
         cursor: pointer;
-        background-image: url("data:image/svg+xml,%3Csvg width='10' height='5' viewBox='0 0 10 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 0.5L5 4.5L9 0.5' stroke='%23222' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg width='10' height='5' viewBox='0 0 10 5' fill='none'%3E%3Cpath d='M1 0.5L5 4.5L9 0.5' stroke='%23222' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 8px center;
         padding-right: 24px;
@@ -580,26 +580,52 @@
         cursor: not-allowed;
       }
 
-      .key-row {
-        display: flex;
-        gap: 8px;
-        margin-top: 8px;
+      .kb-field {
+        height: 32px;
+        padding: 0 8px;
+        border: 1px solid var(--border-soft);
+        box-sizing: border-box;
       }
 
-      .field > .key-row {
+      .kb-field.kb-url {
+        padding-right: 4px;
+      }
+
+      .key-input-locked {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        height: 32px;
+        padding: 0 4px 0 8px;
+        border: 1px solid var(--border-soft);
+        border-radius: 8px;
+        background: var(--field-disabled-bg);
+        box-sizing: border-box;
+      }
+
+      .key-input-locked-field {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        background: transparent;
+        padding: 0;
+        font-size: 14px;
+        color: var(--overlay-32);
+        cursor: not-allowed;
+      }
+
+      .key-input-locked-field:disabled {
+        background: transparent;
+      }
+
+      .field > .key-input-locked {
         margin-top: 0;
       }
 
-      .key-row + .select-input,
       .api-row + .select-input,
       .section > .select-input,
       .api-row + .section-caption {
         margin-top: 8px;
-      }
-
-      .key-row .key-input {
-        flex: 1;
-        border-radius: 8px;
       }
 
       .field {
@@ -770,19 +796,63 @@
       }
 
       .kb-name {
-        width: 160px;
-        flex-shrink: 0;
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .kb-name-text {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        min-width: 0;
       }
 
       .kb-url {
+        flex: 2;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .kb-url-text {
         flex: 1;
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      .kb-copy-btn {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        color: var(--text);
+        transition:
+          transform var(--dur-base) var(--ease),
+          background var(--dur-base) var(--ease),
+          color var(--dur-base) var(--ease);
+      }
+
+      .kb-copy-btn:hover {
+        background: var(--hover-bg);
+      }
+
+      .kb-copy-btn.is-copied {
+        color: var(--score-green-tag);
+      }
+
+      .field-edit-btn {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        color: var(--text);
+      }
+
+      .field-edit-btn:hover {
+        background: var(--hover-bg);
       }
 
       .accordion {
@@ -2213,6 +2283,45 @@
         }
       }
 
+      function copyToClipboard(text, btn) {
+        const onCopied = () => {
+          flashCopyButton(btn);
+        };
+        const fallback = () => {
+          try {
+            const area = document.createElement("textarea");
+            area.value = text;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            document.body.removeChild(area);
+            onCopied();
+          } catch (_) {
+            toast("Не удалось скопировать ссылку", "error");
+          }
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(onCopied, fallback);
+        } else {
+          fallback();
+        }
+      }
+
+      function flashCopyButton(btn) {
+        if (!btn) return;
+        if (btn._copyResetTimer) clearTimeout(btn._copyResetTimer);
+        const original = btn._copyOriginalHtml ?? btn.innerHTML;
+        btn._copyOriginalHtml = original;
+        btn.innerHTML = ICONS.check;
+        btn.classList.add("is-copied");
+        btn._copyResetTimer = setTimeout(() => {
+          btn.innerHTML = original;
+          btn.classList.remove("is-copied");
+        }, 1200);
+      }
+
       function toast(msg, type = "info") {
         const id = ++toastSeq;
         state.toasts.push({ id, message: msg, type });
@@ -2264,34 +2373,6 @@
           .filter(Boolean);
         const urls = fromSettings.length ? fromSettings : SOURCES.map((item) => item.url);
         return urls.slice(0, MAX_SOURCE_URLS);
-      }
-
-      function isMarkdownUrl(url) {
-        try {
-          const path = new URL(url).pathname.toLowerCase();
-          return /\.(md|markdown)$/.test(path);
-        } catch (_) {
-          return /\.(md|markdown)(\?|#|$)/i.test(String(url || ""));
-        }
-      }
-
-      async function fetchUrlText(url) {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Не удалось загрузить: ${url}`);
-        return await res.text();
-      }
-
-      function sanitizeText(input) {
-        return String(input || "")
-          .replace(/<script[\s\S]*?<\/script>/gi, " ")
-          .replace(/<style[\s\S]*?<\/style>/gi, " ")
-          .replace(/```[\s\S]*?```/g, " ")
-          .replace(/<[^>]+>/g, " ")
-          .replace(/&nbsp;/gi, " ")
-          .replace(/&amp;/gi, "&")
-          .replace(/&quot;/gi, '"')
-          .replace(/\s+/g, " ")
-          .trim();
       }
 
       function sanitizeMarkdownText(input) {
@@ -2456,23 +2537,6 @@
           state.settings.model = DEFAULT_MODELS[state.settings.endpoint] || models[0];
       }
 
-      function sourceCacheKey(url) {
-        return `kta-src:${url}`;
-      }
-
-      function readSourceCache(url) {
-        try {
-          const raw = storage.getItem(sourceCacheKey(url));
-          return raw ? JSON.parse(raw) : null;
-        } catch (_) {
-          return null;
-        }
-      }
-
-      function writeSourceCache(url, entry) {
-        storage.setItem(sourceCacheKey(url), JSON.stringify(entry));
-      }
-
       function bundledEntry(url) {
         const text = BUNDLED_SOURCE_TEXTS && BUNDLED_SOURCE_TEXTS[url];
         if (!text) return null;
@@ -2493,49 +2557,8 @@
         };
       }
 
-      function makeSourceEntry(url, raw, fromNetwork) {
-        const isMd = fromNetwork ? isMarkdownUrl(url) || /^\s*#/m.test(raw) : true;
-        const sanitized = (isMd ? sanitizeMarkdownText(raw) : sanitizeText(raw)).slice(0, 20000);
-        const customLabel = customSourceTitle(url);
-        const title =
-          customLabel || (isMd && firstMarkdownHeading(sanitized)) || ruleSectionTitle(url, url);
-        return {
-          id: url,
-          type: isMd ? "markdown" : "url",
-          source: url,
-          label: customLabel || sourceLabel(url, url),
-          title,
-          text: sanitized,
-          points: extractRulePoints(sanitized),
-          ok: true,
-          loadedAt: new Date().toISOString(),
-        };
-      }
-
-      async function loadSource(url, force) {
-        if (!force) {
-          const cached = readSourceCache(url);
-          if (cached && cached.ok) return cached;
-          const bundled = bundledEntry(url);
-          if (bundled) return bundled;
-          return { id: url, source: url, ok: false, error: "не загружено" };
-        }
-        try {
-          const text = await fetchUrlText(url);
-          const entry = makeSourceEntry(url, text, true);
-          writeSourceCache(url, entry);
-          return entry;
-        } catch (e) {
-          const bundled = bundledEntry(url);
-          if (bundled) return bundled;
-          return {
-            id: url,
-            source: url,
-            ok: false,
-            error: e.message || "Ошибка загрузки",
-            loadedAt: new Date().toISOString(),
-          };
-        }
+      function loadSource(url) {
+        return bundledEntry(url) || { id: url, source: url, ok: false, error: "не загружено" };
       }
 
       function manualRulesEntry() {
@@ -2569,11 +2592,9 @@
         return state.knowledgeBase;
       }
 
-      async function loadKnowledgeBase(force = false) {
+      async function loadKnowledgeBase() {
         const urls = parseUrls(state.settings.sourceUrls);
-        const sourceStatuses = [];
-        for (const url of urls) sourceStatuses.push(await loadSource(url, force));
-        return assembleKnowledgeBase(sourceStatuses);
+        return assembleKnowledgeBase(urls.map(loadSource));
       }
 
       const VARIANTS_SCHEMA = {
@@ -3319,7 +3340,7 @@
           state.knowledgeBase.loadedAt = new Date().toISOString();
           return;
         }
-        await loadKnowledgeBase(false);
+        await loadKnowledgeBase();
       }
 
       function saveSettings() {
@@ -3588,6 +3609,9 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         rule9: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><g fill="#222"><path d="M4 8.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5ZM4.5 6a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1h-6Z"/><path fill-rule="evenodd" d="M1 4.5A2.5 2.5 0 0 1 3.5 2h8A2.5 2.5 0 0 1 14 4.5v6a2.5 2.5 0 0 1-2.5 2.5H8.151l-3.907 2.605A.8.8 0 0 1 3 14.94V12.95a2.5 2.5 0 0 1-2-2.45v-6ZM3.5 3A1.5 1.5 0 0 0 2 4.5v6A1.5 1.5 0 0 0 3.5 12a.5.5 0 0 1 .5.5v2.066l3.723-2.482A.5.5 0 0 1 8 12h3.5a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 11.5 3h-8Z" clip-rule="evenodd"/></g></svg>`,
         rule10: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><g fill="#222"><path fill-rule="evenodd" d="M13 0a.5.5 0 0 1 0 1h-2v2h1.5A2.5 2.5 0 0 1 15 5.5v5a2.5 2.5 0 0 1-2.5 2.5H11v2h2a.5.5 0 0 1 0 1H8a.5.5 0 0 1 0-1h2V1H8a.5.5 0 0 1 0-1h5Zm-2 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 12.5 4H11v8Z" clip-rule="evenodd"/><path d="M8.5 3a.5.5 0 0 1 0 1h-5A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12h5a.5.5 0 0 1 0 1h-5A2.5 2.5 0 0 1 1 10.5v-5A2.5 2.5 0 0 1 3.5 3h5Z"/></g></svg>`,
         rule11: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><g fill="#222"><path d="M11.04 6.009a.5.5 0 1 0-.707-.707L6.845 8.79a.5.5 0 0 1-.707 0L4.667 7.32a.5.5 0 1 0-.708.707l1.472 1.471a1.5 1.5 0 0 0 2.121 0l3.489-3.488Z"/><path fill-rule="evenodd" d="M4 1a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3V4a3 3 0 0 0-3-3H4ZM2 4a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Z" clip-rule="evenodd"/></g></svg>`,
+        copy: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><g fill="currentColor"><path fill-rule="evenodd" d="M6 2.5A1.5 1.5 0 0 1 7.5 1h4A1.5 1.5 0 0 1 13 2.5v7A1.5 1.5 0 0 1 11.5 11h-4A1.5 1.5 0 0 1 6 9.5v-7ZM7.5 2a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-4Z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3 4.5A1.5 1.5 0 0 1 4.5 3H5v1h-.5a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V11h1v.5A1.5 1.5 0 0 1 8.5 13h-4A1.5 1.5 0 0 1 3 11.5v-7Z" clip-rule="evenodd"/></g></svg>`,
+        check: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><path fill="currentColor" fill-rule="evenodd" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-6.5 6.5a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l2.47 2.47 5.97-5.97a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/></svg>`,
+        edit: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><path fill="currentColor" fill-rule="evenodd" d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61a2.25 2.25 0 0 1-.983.573l-3.06.85a.75.75 0 0 1-.924-.924l.85-3.06a2.25 2.25 0 0 1 .573-.983l8.61-8.61v-.002l.984-.984v.001Zm1.414 1.06a.25.25 0 0 0-.354 0L11 3.56l1.44 1.44 1.073-1.073a.25.25 0 0 0 0-.354l-1.086-1.086ZM11.38 5.94 9.94 4.5 3.98 10.46a.75.75 0 0 0-.19.328l-.51 1.838 1.838-.51a.75.75 0 0 0 .328-.19L11.38 5.94Z" clip-rule="evenodd"/></svg>`,
       };
 
       function ruleIcon(title, idx) {
@@ -3769,9 +3793,9 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
               ${
                 isApiTokenLocked()
                   ? `
-              <div class="key-row">
-                <input class="key-input" id="apiTokenInput" type="text" value="${escapeHtml(maskApiToken(currentApiToken()))}" disabled readonly />
-                <button class="btn-check" id="changeApiTokenBtn" type="button">Изменить</button>
+              <div class="key-input-locked">
+                <input class="key-input-locked-field" id="apiTokenInput" type="text" value="${escapeHtml(maskApiToken(currentApiToken()))}" disabled readonly />
+                <button class="icon-btn field-edit-btn" id="changeApiTokenBtn" type="button" aria-label="Изменить API-ключ" title="Изменить API-ключ">${ICONS.edit}</button>
               </div>
               `
                   : `
@@ -3850,8 +3874,11 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
       function sourceRow(source) {
         return `
         <div class="kb-row">
-          <input class="text-input kb-field kb-name" disabled value="${escapeHtml(source.title)}" title="${escapeHtml(source.title)}" />
-          <input class="text-input kb-field kb-url" disabled value="${escapeHtml(source.url)}" title="${escapeHtml(source.url)}" />
+          <div class="kb-field kb-name" title="${escapeHtml(source.title)}"><span class="kb-name-text">${escapeHtml(source.title)}</span></div>
+          <div class="kb-field kb-url">
+            <div class="kb-url-text" title="${escapeHtml(source.url)}">${escapeHtml(source.url)}</div>
+            <button class="icon-btn kb-copy-btn" type="button" data-copy-url="${escapeHtml(source.url)}" aria-label="Скопировать ссылку" title="Скопировать ссылку">${ICONS.copy}</button>
+          </div>
         </div>
       `;
       }
@@ -4499,6 +4526,10 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             state.openRule = state.openRule === idx ? -1 : idx;
             render();
           };
+        });
+
+        document.querySelectorAll("[data-copy-url]").forEach((el) => {
+          el.onclick = () => copyToClipboard(el.dataset.copyUrl, el);
         });
 
         document.querySelectorAll("[data-mode]").forEach((el) => {

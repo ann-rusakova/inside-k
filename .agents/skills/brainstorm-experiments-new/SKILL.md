@@ -1,6 +1,6 @@
 ---
 name: brainstorm-experiments-new
-description: "Design lean startup experiments (pretotypes) for a new product. Creates XYZ hypotheses and suggests low-effort validation methods like landing pages, explainer videos, and pre-orders. Use when validating a new product idea, creating pretotypes, or testing market demand."
+description: "Design lean startup experiments (pretotypes) for a NEW product or idea that doesn't exist yet. Creates XYZ hypotheses and suggests low-effort validation methods like landing pages, explainer videos, and pre-orders. Use when validating a new product idea before building it, creating pretotypes, or testing market demand. Триггеры: «как проверить идею нового продукта», «претотип», «XYZ-гипотеза», «проверка спроса без кода», «lean startup experiment», «landing page test», «pretotype». НЕ используй для проверки гипотез СУЩЕСТВУЮЩЕГО продукта или фичи, которая уже есть в проде (для этого brainstorm-experiments-existing), и не используй для построения Opportunity Solution Tree целиком (opportunity-solution-tree)."
 ---
 
 ## Design Lean Startup Experiments (New Product)

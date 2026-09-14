@@ -1,6 +1,6 @@
 ---
 name: brainstorm-experiments-existing
-description: "Design experiments to test assumptions for an existing product — prototypes, A/B tests, spikes, and other low-effort validation methods. Use when validating assumptions, testing feature ideas cheaply, or planning product experiments."
+description: "Design experiments to test assumptions for an EXISTING product or feature — prototypes, A/B tests, spikes, and other low-effort validation methods. Use when validating assumptions, testing feature ideas cheaply, or planning product experiments for something already built and in use. Триггеры: «придумай эксперименты для проверки гипотезы», «как дешево проверить эту идею», «спроектируй A/B-тест», «прототип для проверки гипотезы», «test this assumption cheaply», «design experiments». НЕ используй для проверки идеи НОВОГО продукта с нуля, который ещё не существует (для этого brainstorm-experiments-new), и не используй для построения Opportunity Solution Tree целиком (opportunity-solution-tree)."
 ---
 
 ## Design Experiments (Existing Product)

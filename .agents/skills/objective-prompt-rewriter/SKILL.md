@@ -1,6 +1,6 @@
 ---
 name: objective-prompt-rewriter
-description: Audit and rewrite draft prompts into neutral, evidence-oriented English prompts that reduce sycophancy, leading assumptions, desired-answer bias, false balance, and agreement pressure while requiring the eventual answer in Russian. Use when the user asks to rewrite, improve, neutralize, de-bias, human-check, or make a prompt objective; requests an anti-sycophancy or non-leading prompt; supplies a draft that seeks validation of a predetermined conclusion; or replies to clarification questions from an active prompt-rewrite workflow.
+description: Audit and rewrite draft prompts into neutral, evidence-oriented English prompts that reduce sycophancy, leading assumptions, desired-answer bias, false balance, and agreement pressure while requiring the eventual answer in Russian. Use when the user asks to rewrite, improve, neutralize, de-bias, human-check, or make a prompt objective; requests an anti-sycophancy or non-leading prompt; supplies a draft that seeks validation of a predetermined conclusion; or replies to clarification questions from an active prompt-rewrite workflow. Триггеры: «перепиши промпт нейтрально», «убери биас из промпта», «не наводящий промпт», «anti-sycophancy prompt», «de-bias this prompt». НЕ используй, если пользователь просит просто ответить на вопрос по существу, а не переписать формулировку самого промпта.
 license: MIT
 ---
 

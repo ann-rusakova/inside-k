@@ -16,9 +16,12 @@ try {
     .relative(projectRoot, path.resolve(projectRoot, file.replaceAll("\\", "/")))
     .split(path.sep)
     .join("/");
-  const isSkill = /^(?:\.agents|\.claude|\.cursor)\/skills\//.test(relativePath);
+  const isBundledSkill =
+    /^(?:\.agents|\.claude|\.cursor)\/skills\/(only-editor|full-analysis-text)\//.test(
+      relativePath
+    );
   const isReference = relativePath.startsWith("references/");
-  if (isSkill || isReference) {
+  if (isBundledSkill || isReference) {
     console.log(
       JSON.stringify({
         systemMessage:

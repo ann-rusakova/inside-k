@@ -1,6 +1,6 @@
 ---
 name: opportunity-solution-tree
-description: "Build an Opportunity Solution Tree (OST) to structure product discovery — map a desired outcome to opportunities, solutions, and experiments. Based on Teresa Torres' Continuous Discovery Habits. Use when structuring discovery work, mapping opportunities to solutions, or deciding what to build next."
+description: "Build an Opportunity Solution Tree (OST) to structure product discovery — map a desired outcome to opportunities, solutions, and experiments. Based on Teresa Torres' Continuous Discovery Habits. Use when structuring discovery work, mapping opportunities to solutions, or deciding what to build next. Триггеры: «построй OST», «структурируй discovery», «дерево возможностей и решений», «от outcome к opportunities», «что делать дальше в продукте», «opportunity solution tree». НЕ используй, если нужен только один эксперимент или прототип без дерева целиком (для этого brainstorm-experiments-existing/brainstorm-experiments-new), и не используй для JTBD-артефактов (jtbd)."
 ---
 
 ## Opportunity Solution Tree (OST)
