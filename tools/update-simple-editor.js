@@ -236,7 +236,7 @@ function verifyPlugin(html) {
     }
     assert.equal(
       (app.match(/callModel\(buildSystemBlocks\(\), user, VARIANTS_SCHEMA\)/g) || []).length,
-      2
+      4
     );
     assert.ok(app.includes('buildSystemBlocks(scope, "check"), user, CHECK_SCHEMA'));
     assert.ok(app.includes('buildSystemBlocks(scope, "check"), user, FRAME_SCHEMA'));

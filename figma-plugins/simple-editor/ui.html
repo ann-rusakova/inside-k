@@ -1182,6 +1182,183 @@
         margin-right: 8px;
       }
 
+      .fix-advice-btn {
+        width: 100%;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: 14px;
+        color: var(--text);
+        cursor: pointer;
+      }
+
+      .fix-advice-btn:hover:not(:disabled) {
+        background: var(--hover-bg);
+        border-color: var(--overlay-24);
+      }
+
+      .fix-advice-btn:active:not(:disabled) {
+        transform: scale(0.99);
+      }
+
+      .fix-advice-btn:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      .fix-advice-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .chat-bottom-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 16px 16px;
+        border-top: 1px solid var(--border-soft);
+        flex-shrink: 0;
+      }
+
+      .screen.result-screen {
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .result-sidebar {
+        flex-shrink: 0;
+        overflow-y: auto;
+        padding: 32px 16px 24px;
+      }
+
+      .result-main {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .result-variants-pane {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 0 16px;
+      }
+
+      @media (min-width: 640px) {
+        .screen.result-screen {
+          flex-direction: row;
+        }
+
+        .result-sidebar {
+          width: 46%;
+          min-width: 260px;
+          border-right: 1px solid var(--border-soft);
+        }
+
+        .result-main {
+          min-width: 0;
+        }
+
+        .result-variants-pane {
+          padding: 32px 16px 0;
+        }
+      }
+
+      .mode-scroll {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        flex-shrink: 0;
+      }
+
+      .mode-scroll .action-btn {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+
+      .mode-scroll::-webkit-scrollbar {
+        display: none;
+      }
+
+      .chat-composer {
+        position: relative;
+      }
+
+      .chat-textarea {
+        width: 100%;
+        height: 84px;
+        resize: none;
+        padding: 12px 56px 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--surface);
+        color: var(--text);
+        font-size: 14px;
+        line-height: 20px;
+        outline: none;
+      }
+
+      .chat-textarea::placeholder {
+        color: var(--muted);
+      }
+
+      .chat-textarea:focus {
+        border-color: var(--brand-blue);
+        box-shadow: 0 0 0 2px var(--blue-tint);
+      }
+
+      .chat-textarea:disabled {
+        color: var(--overlay-32);
+        background: var(--field-disabled-bg);
+        border-color: var(--border-soft);
+      }
+
+      .chat-send {
+        position: absolute;
+        right: 10px;
+        bottom: 15px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        border-radius: 10px;
+        background: var(--hover-bg);
+        color: var(--overlay-32);
+        cursor: default;
+      }
+
+      .chat-send svg {
+        display: block;
+        width: 16px;
+        height: 16px;
+        transform: translateY(-1px);
+      }
+
+      .chat-send.active {
+        background: var(--dark-btn);
+        color: var(--dark-btn-text);
+        cursor: pointer;
+      }
+
+      .chat-send.active:hover {
+        background: var(--dark-btn-hover);
+      }
+
+      .chat-send.active:active {
+        background: var(--dark-btn-active);
+        transform: scale(0.94);
+      }
+
       .fix-section {
         margin-top: 16px;
       }
@@ -1870,12 +2047,15 @@
         frameBlocks: [],
         blockVariants: {},
         blockModes: {},
+        blockChatText: {},
         loadingBlock: -1,
         loadingBlockMore: false,
         blockIndex: -1,
         activeBlockIndex: -1,
         mode: "",
         variants: [],
+        chatText: "",
+        chatSending: false,
         analysisResult: null,
         checkResult: null,
         openRule: -1,
@@ -1885,7 +2065,6 @@
           apiUrl: "",
           apiTokens: { claude: "", openai: "", custom: "" },
           model: "claude-sonnet-5",
-          explainVariants: false,
           analyzeNeighbour: false,
           variantsCount: 3,
           sourceUrls: DEFAULT_URLS.join("\n"),
@@ -2167,6 +2346,7 @@
             state.analysisResult = null;
             state.checkResult = null;
             state.mode = "";
+            state.chatText = "";
             if (!["intro", "menu", "settings", "rules"].includes(state.screen)) {
               state.screen = "intro";
               state.stack = [];
@@ -2187,6 +2367,7 @@
             state.frameBlocks = [];
             state.blockVariants = {};
             state.blockModes = {};
+            state.blockChatText = {};
             state.blockIndex = -1;
             state.activeBlockIndex = -1;
           }
@@ -2480,6 +2661,19 @@
         return clean.length <= 4 ? clean : `${clean.slice(0, 4)}••••••••`;
       }
 
+      function updateChatSendState() {
+        const btn = document.getElementById("chatSendBtn");
+        const input = document.getElementById("chatInput");
+        if (!btn || !input) return;
+        const busy =
+          state.screen === "block-detail"
+            ? state.loadingBlock === state.activeBlockIndex
+            : state.loading;
+        const canSend = Boolean(input.value.trim()) && !busy;
+        btn.disabled = !canSend;
+        btn.classList.toggle("active", canSend);
+      }
+
       function updateSettingsActionButtons() {
         const filled = settingsFieldsFilled();
         const saveBtn = document.getElementById("saveSettingsBtn");
@@ -2641,6 +2835,13 @@
           issues: { type: "array", items: ISSUE_SCHEMA },
         },
         required: ["score", "summary", "recommendations", "issues"],
+        additionalProperties: false,
+      };
+
+      const FIX_SCHEMA = {
+        type: "object",
+        properties: { text: { type: "string" } },
+        required: ["text"],
         additionalProperties: false,
       };
 
@@ -2968,6 +3169,179 @@
         return normalizeSpaces(t);
       }
 
+      function mockFixByAdvice(text) {
+        let t = normalizeSpaces(text);
+        if (!t) return t;
+        t = t.replace(/\s*\(([^)]+)\)/g, ", $1");
+        t = t.replace(/\b\d{4,}\b/g, (m) => Number(m).toLocaleString("ru-RU").replace(/ /g, " "));
+        return normalizeSpaces(t);
+      }
+
+      async function generateAdviceFix(text, issues, recommendations) {
+        if (isMockMode()) return mockFixByAdvice(text);
+        await ensureRulesReady();
+        const recs =
+          Array.isArray(recommendations) && recommendations.length
+            ? recommendations
+            : (issues || []).map((issue) => issue.recommendation).filter(Boolean);
+        const user = [
+          `Текст: ${clipText(text, 2000)}`,
+          "Рекомендации по исправлению:",
+          ...(recs.length
+            ? recs.map((r) => `- ${r}`)
+            : ["- Явных замечаний нет, но проверь текст на соответствие редполитике."]),
+          `Соседние тексты на экране: ${neighbourContext()}`,
+          "Исправь текст строго по этим рекомендациям, не меняя остальное без необходимости.",
+          "Верни JSON формата {text:string} — только исправленный текст целиком, без пояснений.",
+        ].join("\n");
+        const out = await callModel(buildSystemBlocks(), user, FIX_SCHEMA);
+        return out.text;
+      }
+
+      async function applyFixFromAdvice(sourceResult, nodeId, originalText) {
+        state.mode = "fix";
+        state.loading = true;
+        state.variants = [];
+        render();
+        try {
+          const issues = Array.isArray(sourceResult?.issues) ? sourceResult.issues : [];
+          const recommendations = Array.isArray(sourceResult?.recommendations)
+            ? sourceResult.recommendations
+            : [];
+          const fixedText = await generateAdviceFix(originalText, issues, recommendations);
+          if (!fixedText || !fixedText.trim())
+            throw new Error("Не удалось получить исправленный текст.");
+          bridge.send("apply-variant", { text: fixedText, nodeId, originalText });
+        } catch (e) {
+          if (!analysisAbort) toast(e.message || "Не удалось исправить текст.", "error");
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      async function applyFixFromAdviceBlock(idx) {
+        const item = state.frameTexts[idx];
+        if (!item) return;
+        const block = blockResult(idx) || {};
+        state.blockModes[idx] = "fix";
+        state.loadingBlock = idx;
+        state.blockVariants[idx] = [];
+        render();
+        try {
+          const fixedText = await generateAdviceFix(item.text, block.issues, block.recommendations);
+          if (!fixedText || !fixedText.trim())
+            throw new Error("Не удалось получить исправленный текст.");
+          bridge.send("apply-variant", {
+            text: fixedText,
+            nodeId: item.id,
+            originalText: item.text,
+          });
+        } catch (e) {
+          if (!analysisAbort) toast(e.message || "Не удалось исправить текст.", "error");
+        } finally {
+          state.loadingBlock = -1;
+          render();
+        }
+      }
+
+      async function sendChatVariants() {
+        const text = (state.chatText || "").trim();
+        if (!text || state.loading) return;
+        state.loading = true;
+        state.chatSending = true;
+        render();
+        try {
+          let next;
+          if (isMockMode()) {
+            next = generateMockVariants(state.selectionText, state.mode || "rephrase", text);
+          } else {
+            await ensureRulesReady();
+            const issues = Array.isArray(state.analysisResult?.issues)
+              ? state.analysisResult.issues
+              : [];
+            const recs = issues.map((issue) => issue.recommendation).filter(Boolean);
+            const task = state.mode
+              ? generationTaskName(state.mode)
+              : "Улучшить текст с учётом запроса";
+            const user = [
+              `Задача: ${task}.`,
+              `Текст: ${clipText(state.selectionText, 2000)}`,
+              recs.length
+                ? `Учти рекомендации по исправлению:\n${recs.map((r) => `- ${r}`).join("\n")}`
+                : "",
+              `Дополнительный запрос пользователя: ${clipText(text, 500)}`,
+              `Соседние тексты на экране: ${neighbourContext()}`,
+              `Нужно сгенерировать ${state.settings.variantsCount} вариантов.`,
+              "Верни JSON формата {variants:[{text,score,reason,tags:[]}]}.",
+              "score от 0 до 10 по соответствию редполитике.",
+              "reason — короткое пояснение тона варианта.",
+            ]
+              .filter(Boolean)
+              .join("\n");
+            const out = await callModel(buildSystemBlocks(), user, VARIANTS_SCHEMA);
+            next = Array.isArray(out.variants) ? out.variants : [];
+            if (!next.length) throw new Error("Модель вернула пустой ответ.");
+          }
+          state.variants = next;
+          state.chatText = "";
+        } catch (e) {
+          if (!analysisAbort) toast(e.message || "Не удалось получить варианты.", "error");
+        } finally {
+          state.loading = false;
+          state.chatSending = false;
+          render();
+        }
+      }
+
+      async function sendBlockChatVariants(idx) {
+        const item = state.frameTexts[idx];
+        const text = (state.blockChatText[idx] || "").trim();
+        if (!text || !item || state.loadingBlock === idx) return;
+        state.loadingBlock = idx;
+        state.chatSending = true;
+        render();
+        try {
+          let next;
+          if (isMockMode()) {
+            next = generateMockVariants(item.text, state.blockModes[idx] || "rephrase", text);
+          } else {
+            await ensureRulesReady();
+            const block = blockResult(idx) || {};
+            const issues = Array.isArray(block.issues) ? block.issues : [];
+            const recs = issues.map((issue) => issue.recommendation).filter(Boolean);
+            const mode = state.blockModes[idx];
+            const task = mode ? generationTaskName(mode) : "Улучшить текст с учётом запроса";
+            const user = [
+              `Задача: ${task}.`,
+              `Текст: ${clipText(item.text, 2000)}`,
+              recs.length
+                ? `Учти рекомендации по исправлению:\n${recs.map((r) => `- ${r}`).join("\n")}`
+                : "",
+              `Дополнительный запрос пользователя: ${clipText(text, 500)}`,
+              `Соседние тексты на экране: ${frameContext(idx)}`,
+              `Нужно сгенерировать ${state.settings.variantsCount} вариантов.`,
+              "Верни JSON формата {variants:[{text,score,reason,tags:[]}]}.",
+              "score от 0 до 10 по соответствию редполитике.",
+              "reason — короткое пояснение тона варианта.",
+            ]
+              .filter(Boolean)
+              .join("\n");
+            const out = await callModel(buildSystemBlocks(), user, VARIANTS_SCHEMA);
+            next = Array.isArray(out.variants) ? out.variants : [];
+            if (!next.length) throw new Error("Модель вернула пустой ответ.");
+          }
+          state.blockVariants[idx] = next;
+          state.blockChatText[idx] = "";
+        } catch (e) {
+          if (!analysisAbort) toast(e.message || "Не удалось получить варианты.", "error");
+        } finally {
+          state.loadingBlock = -1;
+          state.chatSending = false;
+          render();
+        }
+      }
+
       function estimateScore(text) {
         const lower = (text || "").toLowerCase();
         let score = 7;
@@ -2994,11 +3368,40 @@
         return tags;
       }
 
-      function generateMockVariants(base = state.selectionText, mode = state.mode) {
+      function mockChatTransform(text, instruction) {
+        let t = normalizeSpaces(text);
+        const lower = normalizeSpaces(instruction || "").toLowerCase();
+        if (!lower) return t;
+
+        const removeMatch = lower.match(/(?:убери|удали|без)\s+(.+)/);
+        if (removeMatch) {
+          const target = removeMatch[1].trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          t = normalizeSpaces(t.replace(new RegExp(target, "gi"), "").replace(/\(\s*\)/g, ""));
+        }
+
+        const notStartMatch = lower.match(/не начина[а-я]*\s+с\s+(.+)/);
+        if (notStartMatch) {
+          const target = notStartMatch[1].trim();
+          if (t.toLowerCase().startsWith(target.toLowerCase()))
+            t = normalizeSpaces(t.slice(target.length));
+        }
+
+        // Инструкция не распознана как известный паттерн — не подставляем её текст
+        // в результат буквально, а показываем, что запрос всё же что-то изменил.
+        if (t === normalizeSpaces(text)) t = mockFixByAdvice(t);
+        return t;
+      }
+
+      function generateMockVariants(
+        base = state.selectionText,
+        mode = state.mode,
+        instruction = ""
+      ) {
         const count = Math.max(1, Math.min(5, Number(state.settings.variantsCount || 3)));
         const variants = [];
         for (let i = 0; i < count; i += 1) {
-          const text = mockTransformText(base, mode);
+          let text = mockTransformText(base, mode);
+          if (instruction) text = mockChatTransform(text, instruction);
           variants.push({
             text,
             score: estimateScore(text),
@@ -3232,6 +3635,7 @@
         state.frameBlocks = [];
         state.blockVariants = {};
         state.blockModes = {};
+        state.blockChatText = {};
         state.blockIndex = -1;
         state.activeBlockIndex = -1;
         state.variants = [];
@@ -3522,6 +3926,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         }
         state.variants = [];
         state.mode = "";
+        state.chatText = "";
         state.analysisResult = null;
         state.loaderPhrase = LOADER_PHRASES[0];
         analysisAbort = false;
@@ -3612,6 +4017,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         copy: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><g fill="currentColor"><path fill-rule="evenodd" d="M6 2.5A1.5 1.5 0 0 1 7.5 1h4A1.5 1.5 0 0 1 13 2.5v7A1.5 1.5 0 0 1 11.5 11h-4A1.5 1.5 0 0 1 6 9.5v-7ZM7.5 2a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-4Z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3 4.5A1.5 1.5 0 0 1 4.5 3H5v1h-.5a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V11h1v.5A1.5 1.5 0 0 1 8.5 13h-4A1.5 1.5 0 0 1 3 11.5v-7Z" clip-rule="evenodd"/></g></svg>`,
         check: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><path fill="currentColor" fill-rule="evenodd" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-6.5 6.5a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l2.47 2.47 5.97-5.97a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/></svg>`,
         edit: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><path fill="currentColor" fill-rule="evenodd" d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61a2.25 2.25 0 0 1-.983.573l-3.06.85a.75.75 0 0 1-.924-.924l.85-3.06a2.25 2.25 0 0 1 .573-.983l8.61-8.61v-.002l.984-.984v.001Zm1.414 1.06a.25.25 0 0 0-.354 0L11 3.56l1.44 1.44 1.073-1.073a.25.25 0 0 0 0-.354l-1.086-1.086ZM11.38 5.94 9.94 4.5 3.98 10.46a.75.75 0 0 0-.19.328l-.51 1.838 1.838-.51a.75.75 0 0 0 .328-.19L11.38 5.94Z" clip-rule="evenodd"/></svg>`,
+        send: `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" ><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M8 12.5V3.5M8 3.5 4 7.5M8 3.5l4 4"/></svg>`,
       };
 
       function ruleIcon(title, idx) {
@@ -3825,16 +4231,6 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             <div class="toggles">
               <div class="toggle-row">
                 <div>
-                  <div class="toggle-text">Почему рекомендуем этот вариант</div>
-                  <div class="toggle-caption">Почему вариант соответствует Редполитике Контура</div>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="explainInput" ${state.settings.explainVariants ? "checked" : ""} />
-                  <span class="switch-slider"></span>
-                </label>
-              </div>
-              <div class="toggle-row">
-                <div>
                   <div class="toggle-text">Читать контекст макета</div>
                   <div class="toggle-caption">Анализировать соседние тексты на странице</div>
                 </div>
@@ -4011,6 +4407,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
       }
 
       const MODE_LOADER_LABELS = {
+        fix: "Исправляю",
         rephrase: "Переформулирую",
         shorten: "Сокращаю",
         clarify: "Делаю четче",
@@ -4022,6 +4419,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
       }
 
       function modeLoaderText() {
+        if (state.chatSending) return "Исправляю";
         if (state.loadingMore) return "Добавляю варианты";
         return MODE_LOADER_LABELS[state.mode] || "Подбираю варианты";
       }
@@ -4042,11 +4440,33 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
       `;
       }
 
+      function chatBottomBarHtml(modeButtonsHtml, chatText, busy) {
+        const canSend = Boolean((chatText || "").trim()) && !busy;
+        return `
+        <div class="bottom-bar chat-bottom-bar">
+          <div class="mode-scroll">${modeButtonsHtml}</div>
+          <div class="chat-composer">
+            <textarea id="chatInput" class="chat-textarea" placeholder="Добавить контекста..." aria-label="Дополнительный контекст" ${busy ? "disabled" : ""}>${escapeHtml(chatText || "")}</textarea>
+            <button class="chat-send ${canSend ? "active" : ""}" id="chatSendBtn" type="button" ${canSend ? "" : "disabled"} aria-label="Отправить">${ICONS.send}</button>
+          </div>
+        </div>
+      `;
+      }
+
+      function analysisModeChipsHtml() {
+        const active = state.mode;
+        return `
+        ${modeButtonHtml("fix", ICONS.edit, "Исправить по совету", active)}
+        ${modeButtonHtml("rephrase", ICONS.refresh, "Переформулировать", active)}
+        ${modeButtonHtml("shorten", ICONS.scissors, "Сократить", active)}
+        ${modeButtonHtml("clarify", ICONS.bulb, "Сделать четче", active)}
+        ${modeButtonHtml("friendly", ICONS.friendly, "Сделать дружелюбнее", active)}
+      `;
+      }
+
       function analysisResultView() {
         const result = state.analysisResult || { score: 0, tags: [] };
         const score = Number(result.score || 0);
-        const active = state.mode;
-        const hasBottomBar = !state.loading && state.variants.length;
         const issues = Array.isArray(result.issues)
           ? result.issues.filter((item) => item?.recommendation)
           : [];
@@ -4055,8 +4475,8 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             `<li class="fix-item" data-fragment-idx="${idx}">${escapeHtml(issue.recommendation)}</li>`
         );
         return `
-        <div class="screen padded-flush ${hasBottomBar ? "" : "no-bottom-bar"}">
-          <div class="${state.loading ? "is-dimmed" : ""}">
+        <div class="screen result-screen">
+          <div class="result-sidebar ${state.loading ? "is-dimmed" : ""}">
             <div class="score-header">
               <span class="score-title">Индекс качества текста — ${score}/10</span>
               <button class="icon-btn help-icon help-icon-static tooltip tooltip-hover" id="openIndexBtn" type="button" aria-label="Шкала индекса" tabindex="0">
@@ -4071,43 +4491,33 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
                 ${fixItems.length ? fixItems.join("") : "<li>Замечаний нет</li>"}
               </ul>
             </div>
-            <div class="actions">
-              ${modeButtonHtml("rephrase", ICONS.refresh, "Переформулировать", active)}
-              ${modeButtonHtml("shorten", ICONS.scissors, "Сократить", active)}
-              ${modeButtonHtml("clarify", ICONS.bulb, "Сделать четче", active)}
-              ${modeButtonHtml("friendly", ICONS.friendly, "Сделать дружелюбнее", active)}
+          </div>
+          <div class="result-main">
+            <div class="result-variants-pane">
+              ${
+                !state.loading && state.variants.length
+                  ? `
+                <div class="variants-section">
+                  <div class="variants-title">Варианты</div>
+                  ${state.variants
+                    .map(
+                      (variant, idx) => `
+                        <button class="variant-card applyVariantBtn" data-idx="${idx}" type="button">
+                          <div class="variant-text">${escapeHtml(variant.text || "")}</div>
+                        </button>
+                      `
+                    )
+                    .join("")}
+                  <button class="more-btn" id="moreVariantsBtn" type="button">${ICONS.sparklesBtn} Еще варианты</button>
+                </div>
+              `
+                  : ""
+              }
             </div>
+            ${chatBottomBarHtml(analysisModeChipsHtml(), state.chatText, state.loading)}
           </div>
           ${state.loading ? modeLoaderHtml(modeLoaderText()) : ""}
-          ${
-            !state.loading && state.variants.length
-              ? `
-            <div class="variants-section">
-              <div class="variants-title">Варианты</div>
-              ${state.variants
-                .map((variant, idx) => {
-                  return `
-                    <button class="variant-card applyVariantBtn" data-idx="${idx}" type="button">
-                      <div class="variant-text">${escapeHtml(variant.text || "")}</div>
-                      ${
-                        state.settings.explainVariants
-                          ? `<div class="variant-tone">${escapeHtml(variant.reason || "")}</div>`
-                          : ""
-                      }
-                    </button>
-                  `;
-                })
-                .join("")}
-            </div>
-          `
-              : ""
-          }
         </div>
-        ${
-          !state.loading && state.variants.length
-            ? `<div class="bottom-bar"><button class="more-btn" id="moreVariantsBtn" type="button">${ICONS.sparklesBtn} Еще варианты</button></div>`
-            : ""
-        }
       `;
       }
 
@@ -4127,21 +4537,27 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
             )
           : recommendations.map((item) => `<li class="fix-item">${escapeHtml(item)}</li>`);
         return `
-        <div class="screen padded">
-          <div class="score-header">
-            <span class="score-title">Соответствие текста правилам — ${score}/10</span>
-            <button class="icon-btn help-icon help-icon-static tooltip tooltip-hover" id="openIndexBtn" type="button" aria-label="Шкала индекса" tabindex="0">
-              ${ICONS.help}
-              <span class="tooltip-bubble">Оценка от 0 до 10, как если бы текст вычитал редактор</span>
-            </button>
+        <div class="screen padded-flush">
+          <div class="${state.loading ? "is-dimmed" : ""}">
+            <div class="score-header">
+              <span class="score-title">Соответствие текста правилам — ${score}/10</span>
+              <button class="icon-btn help-icon help-icon-static tooltip tooltip-hover" id="openIndexBtn" type="button" aria-label="Шкала индекса" tabindex="0">
+                ${ICONS.help}
+                <span class="tooltip-bubble">Оценка от 0 до 10, как если бы текст вычитал редактор</span>
+              </button>
+            </div>
+            ${resultCardHtml(state.selectionText, [], score, false, issues)}
+            <div class="fix-section">
+              <div class="fix-title">Как исправить текст</div>
+              <ul class="fix-list">
+                ${fixItems.length ? fixItems.join("") : "<li>Замечаний нет</li>"}
+              </ul>
+            </div>
           </div>
-          ${resultCardHtml(state.selectionText, [], score, false, issues)}
-          <div class="fix-section">
-            <div class="fix-title">Как исправить текст</div>
-            <ul class="fix-list">
-              ${fixItems.length ? fixItems.join("") : "<li>Замечаний нет</li>"}
-            </ul>
-          </div>
+          ${state.loading ? modeLoaderHtml(modeLoaderText()) : ""}
+        </div>
+        <div class="bottom-bar">
+          <button class="fix-advice-btn" id="checkFixBtn" type="button" ${state.loading ? "disabled" : ""}>${ICONS.edit} Исправить по совету</button>
         </div>
       `;
       }
@@ -4164,8 +4580,20 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
       }
 
       function blockModeLoaderText(idx) {
+        if (state.chatSending) return "Исправляю";
         if (state.loadingBlockMore) return "Добавляю варианты";
         return MODE_LOADER_LABELS[state.blockModes[idx]] || "Подбираю варианты";
+      }
+
+      function blockModeChipsHtml(idx) {
+        const active = state.blockModes[idx] || "";
+        return `
+        ${blockModeButtonHtml(idx, "fix", ICONS.edit, "Исправить по совету", active)}
+        ${blockModeButtonHtml(idx, "rephrase", ICONS.refresh, "Переформулировать", active)}
+        ${blockModeButtonHtml(idx, "shorten", ICONS.scissors, "Сократить", active)}
+        ${blockModeButtonHtml(idx, "clarify", ICONS.bulb, "Сделать четче", active)}
+        ${blockModeButtonHtml(idx, "friendly", ICONS.friendly, "Сделать дружелюбнее", active)}
+      `;
       }
 
       function blockDetailView() {
@@ -4174,13 +4602,18 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         if (!item) return frameResultView();
         const block = blockResult(idx) || { score: 0, tags: [], issues: [] };
         const score = Number(block.score || 0);
-        const active = state.blockModes[idx] || "";
         const variants = state.blockVariants[idx] || [];
         const loading = state.loadingBlock === idx;
-        const hasBottomBar = !loading && variants.length;
+        const issues = Array.isArray(block.issues)
+          ? block.issues.filter((item2) => item2?.recommendation)
+          : [];
+        const fixItems = issues.map(
+          (issue, i) =>
+            `<li class="fix-item" data-fragment-idx="${i}">${escapeHtml(issue.recommendation)}</li>`
+        );
         return `
-        <div class="screen padded-flush ${hasBottomBar ? "" : "no-bottom-bar"}">
-          <div class="${loading ? "is-dimmed" : ""}">
+        <div class="screen result-screen">
+          <div class="result-sidebar ${loading ? "is-dimmed" : ""}">
             <div class="score-header">
               <span class="score-title">Индекс качества текста — ${score}/10</span>
               <button class="icon-btn help-icon help-icon-static tooltip tooltip-hover" id="openIndexBtn" type="button" aria-label="Шкала индекса" tabindex="0">
@@ -4188,44 +4621,40 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
                 <span class="tooltip-bubble">Показывает, насколько текст соответствует стандартам редполитики. Учитывает пунктуацию, числа, термины и стиль</span>
               </button>
             </div>
-            ${resultCardHtml(item.text, block.tags, score, true, block.issues)}
-            <div class="actions">
-              ${blockModeButtonHtml(idx, "rephrase", ICONS.refresh, "Переформулировать", active)}
-              ${blockModeButtonHtml(idx, "shorten", ICONS.scissors, "Сократить", active)}
-              ${blockModeButtonHtml(idx, "clarify", ICONS.bulb, "Сделать четче", active)}
-              ${blockModeButtonHtml(idx, "friendly", ICONS.friendly, "Сделать дружелюбнее", active)}
+            ${resultCardHtml(item.text, block.tags, score, false, block.issues)}
+            <div class="fix-section">
+              <div class="fix-title">Как исправить текст</div>
+              <ul class="fix-list">
+                ${fixItems.length ? fixItems.join("") : "<li>Замечаний нет</li>"}
+              </ul>
             </div>
           </div>
-          ${loading ? modeLoaderHtml(blockModeLoaderText(idx)) : ""}
-          ${
-            !loading && variants.length
-              ? `
-            <div class="variants-section">
-              <div class="variants-title">Варианты</div>
-              ${variants
-                .map(
-                  (variant, vIdx) => `
-                    <button class="variant-card applyVariantBtn" data-block="${idx}" data-idx="${vIdx}" type="button">
-                      <div class="variant-text">${escapeHtml(variant.text || "")}</div>
-                      ${
-                        state.settings.explainVariants
-                          ? `<div class="variant-tone">${escapeHtml(variant.reason || "")}</div>`
-                          : ""
-                      }
-                    </button>
-                  `
-                )
-                .join("")}
+          <div class="result-main">
+            <div class="result-variants-pane">
+              ${
+                !loading && variants.length
+                  ? `
+                <div class="variants-section">
+                  <div class="variants-title">Варианты</div>
+                  ${variants
+                    .map(
+                      (variant, vIdx) => `
+                        <button class="variant-card applyVariantBtn" data-block="${idx}" data-idx="${vIdx}" type="button">
+                          <div class="variant-text">${escapeHtml(variant.text || "")}</div>
+                        </button>
+                      `
+                    )
+                    .join("")}
+                  <button class="more-btn" data-block-more="${idx}" type="button">${ICONS.sparklesBtn} Еще варианты</button>
+                </div>
+              `
+                  : ""
+              }
             </div>
-          `
-              : ""
-          }
+            ${chatBottomBarHtml(blockModeChipsHtml(idx), state.blockChatText[idx], loading)}
+          </div>
+          ${loading ? modeLoaderHtml(blockModeLoaderText(idx)) : ""}
         </div>
-        ${
-          !loading && variants.length
-            ? `<div class="bottom-bar"><button class="more-btn" data-block-more="${idx}" type="button">${ICONS.sparklesBtn} Еще варианты</button></div>`
-            : ""
-        }
       `;
       }
 
@@ -4493,7 +4922,8 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
           el.onclick = () => {
             const idx = Number(el.dataset.block);
             const mode = el.dataset.blockMode;
-            if (state.screen === "frame-result") runExclusive(() => startBlockMode(idx, mode));
+            if (mode === "fix") runExclusive(() => applyFixFromAdviceBlock(idx));
+            else if (state.screen === "frame-result") runExclusive(() => startBlockMode(idx, mode));
             else runExclusive(() => generateBlockVariants(idx, mode, false));
           };
         });
@@ -4533,8 +4963,42 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         });
 
         document.querySelectorAll("[data-mode]").forEach((el) => {
-          el.onclick = () => runExclusive(() => chooseMode(el.dataset.mode));
+          el.onclick = () => {
+            const mode = el.dataset.mode;
+            if (mode === "fix")
+              runExclusive(() =>
+                applyFixFromAdvice(state.analysisResult, state.selectionNodeId, state.selectionText)
+              );
+            else runExclusive(() => chooseMode(mode));
+          };
         });
+
+        const checkFixBtn = document.getElementById("checkFixBtn");
+        if (checkFixBtn) {
+          checkFixBtn.onclick = () =>
+            runExclusive(() =>
+              applyFixFromAdvice(state.checkResult, state.selectionNodeId, state.selectionText)
+            );
+        }
+
+        const chatInput = document.getElementById("chatInput");
+        if (chatInput) {
+          chatInput.oninput = () => {
+            if (state.screen === "block-detail")
+              state.blockChatText[state.activeBlockIndex] = chatInput.value;
+            else state.chatText = chatInput.value;
+            updateChatSendState();
+          };
+        }
+
+        const chatSendBtn = document.getElementById("chatSendBtn");
+        if (chatSendBtn) {
+          chatSendBtn.onclick = () => {
+            if (state.screen === "block-detail")
+              runExclusive(() => sendBlockChatVariants(state.activeBlockIndex));
+            else runExclusive(() => sendChatVariants());
+          };
+        }
 
         document.querySelectorAll(".applyVariantBtn").forEach((el) => {
           el.onclick = () => {
@@ -4611,13 +5075,6 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         if (modelSelect) {
           modelSelect.onchange = () => {
             state.settings.model = modelSelect.value;
-          };
-        }
-
-        const explainInput = document.getElementById("explainInput");
-        if (explainInput) {
-          explainInput.onchange = () => {
-            state.settings.explainVariants = explainInput.checked;
           };
         }
 
