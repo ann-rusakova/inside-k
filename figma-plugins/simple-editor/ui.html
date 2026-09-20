@@ -1197,6 +1197,10 @@
         cursor: pointer;
       }
 
+      .restartBtn {
+        margin-top: 8px;
+      }
+
       .fix-advice-btn:hover:not(:disabled) {
         background: var(--hover-bg);
         border-color: var(--overlay-24);
@@ -1613,8 +1617,8 @@
 
       .toast-stack {
         position: fixed;
-        left: 12px;
-        right: 12px;
+        left: 16px;
+        right: 32px;
         top: 12px;
         z-index: 26;
         display: flex;
@@ -3122,7 +3126,7 @@
             throw await readApiError(response, cfg.provider);
           }
           state.apiStatus = "ok";
-          toast(`Ключ работает, ${cfg.provider} API доступен`, "success");
+          toast("Ключ работает", "success");
         } catch (e) {
           state.apiStatus = "error";
           toast(e.message || "Не удалось проверить ключ", "error");
@@ -3512,7 +3516,7 @@
         }
       }
 
-      async function runCheck(scope) {
+      async function runCheck(scope, force = false) {
         state.loading = true;
         render();
         try {
@@ -3521,7 +3525,7 @@
             return;
           }
           const key = checkCacheKey(scope);
-          const cached = touchCache(key);
+          const cached = !force && touchCache(key);
           if (cached && cached.data) {
             state.checkResult = cached.data;
             return;
@@ -3546,17 +3550,14 @@
           };
           resultCache[key] = { data: state.checkResult, ts: Date.now() };
           persistCache();
-        } catch (e) {
-          if (!analysisAbort) toast(e.message || "Ошибка проверки.", "error");
-          throw e;
         } finally {
           state.loading = false;
           render();
         }
       }
 
-      async function runAnalysis() {
-        await runCheck("full");
+      async function runAnalysis(force = false) {
+        await runCheck("full", force);
         const result = state.checkResult || {};
         const issues = Array.isArray(result.issues)
           ? result.issues.filter((item) => item?.problem)
@@ -3919,7 +3920,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         await task();
       }
 
-      async function startAnalysis() {
+      async function startAnalysis(force = false) {
         if (!hasUsableText()) {
           toast("Выберите один текстовый слой.", "error");
           return;
@@ -3933,7 +3934,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         currentAbortController = new AbortController();
         go("analysis-loading");
         try {
-          await runJobWithLoader(runAnalysis);
+          await runJobWithLoader(() => runAnalysis(force));
           if (analysisAbort) return;
           stopLoaderPhrases();
           if (state.analysisResult) replaceScreen("analysis-result");
@@ -3949,7 +3950,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         }
       }
 
-      async function startCheck() {
+      async function startCheck(force = false) {
         if (!hasUsableText()) {
           toast("Выберите один текстовый слой.", "error");
           return;
@@ -3960,7 +3961,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         currentAbortController = new AbortController();
         go("check-loading");
         try {
-          await runJobWithLoader(() => runCheck("editor"));
+          await runJobWithLoader(() => runCheck("editor", force));
           if (analysisAbort) return;
           stopLoaderPhrases();
           if (state.checkResult) replaceScreen("check-result");
@@ -4491,6 +4492,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
                 ${fixItems.length ? fixItems.join("") : "<li>Замечаний нет</li>"}
               </ul>
             </div>
+            <button class="fix-advice-btn restartBtn" data-restart="analysis" type="button" ${state.loading ? "disabled" : ""}>Начать заново</button>
           </div>
           <div class="result-main">
             <div class="result-variants-pane">
@@ -4558,6 +4560,7 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
         </div>
         <div class="bottom-bar">
           <button class="fix-advice-btn" id="checkFixBtn" type="button" ${state.loading ? "disabled" : ""}>${ICONS.edit} Исправить по совету</button>
+          <button class="fix-advice-btn restartBtn" data-restart="check" type="button" ${state.loading ? "disabled" : ""}>Начать заново</button>
         </div>
       `;
       }
@@ -4973,6 +4976,13 @@ ${state.settings.manualRulesText ? `Дополнительные правила:
           };
         });
 
+        document.querySelectorAll(".restartBtn").forEach((btn) => {
+          btn.onclick = () => {
+            const isCheck = btn.dataset.restart === "check";
+            back();
+            runExclusive(() => (isCheck ? startCheck(true) : startAnalysis(true)));
+          };
+        });
         const checkFixBtn = document.getElementById("checkFixBtn");
         if (checkFixBtn) {
           checkFixBtn.onclick = () =>
