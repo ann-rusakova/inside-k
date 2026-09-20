@@ -2804,11 +2804,8 @@
               type: "object",
               properties: {
                 text: { type: "string" },
-                score: { type: "number" },
-                reason: { type: "string" },
-                tags: { type: "array", items: { type: "string" } },
               },
-              required: ["text", "score", "reason", "tags"],
+              required: ["text"],
               additionalProperties: false,
             },
           },
@@ -2833,12 +2830,9 @@
         type: "object",
         properties: {
           score: { type: "number" },
-          summary: { type: "string" },
-          tags: { type: "array", items: { type: "string" } },
-          recommendations: { type: "array", items: { type: "string" } },
           issues: { type: "array", items: ISSUE_SCHEMA },
         },
-        required: ["score", "summary", "recommendations", "issues"],
+        required: ["score", "issues"],
         additionalProperties: false,
       };
 
@@ -2978,8 +2972,9 @@
         };
       }
 
-      async function callClaude(cfg, systemBlocks, user, schema, signal) {
+      async function callClaude(cfg, systemBlocks, user, schema, signal, options = {}) {
         const supportsAdaptiveThinking = !cfg.defaultModel.startsWith("claude-haiku-");
+        const skipThinking = options.simple && cfg.defaultModel.startsWith("claude-sonnet-");
         const response = await fetch(`${cfg.baseUrl}/messages`, {
           method: "POST",
           signal,
@@ -2995,7 +2990,11 @@
             model: cfg.defaultModel,
             max_tokens: MAX_OUTPUT_TOKENS,
             system: systemBlocks,
-            ...(supportsAdaptiveThinking ? { thinking: { type: "adaptive" } } : {}),
+            ...(skipThinking
+              ? { thinking: { type: "disabled" } }
+              : supportsAdaptiveThinking
+                ? { thinking: { type: "adaptive" } }
+                : {}),
             output_config: {
               ...(supportsAdaptiveThinking ? { effort: "low" } : {}),
               format: { type: "json_schema", schema },
@@ -3036,7 +3035,7 @@
         return parseJsonLoose(data.choices?.[0]?.message?.content || "");
       }
 
-      async function callModel(systemBlocks, user, schema) {
+      async function callModel(systemBlocks, user, schema, options = {}) {
         ensureValidModel();
         const cfg = getProviderConfig();
         if (apiTokenError(cfg.key)) throw new Error(apiTokenError(cfg.key));
@@ -3050,7 +3049,7 @@
           const { signal, dispose } = withTimeout(outerSignal, REQUEST_TIMEOUT_MS);
           try {
             return cfg.provider === "claude"
-              ? await callClaude(cfg, systemBlocks, user, schema, signal)
+              ? await callClaude(cfg, systemBlocks, user, schema, signal, options)
               : await callOpenAI(cfg, systemBlocks, user, signal);
           } finally {
             dispose();
@@ -3198,7 +3197,7 @@
           "Исправь текст строго по этим рекомендациям, не меняя остальное без необходимости.",
           "Верни JSON формата {text:string} — только исправленный текст целиком, без пояснений.",
         ].join("\n");
-        const out = await callModel(buildSystemBlocks(), user, FIX_SCHEMA);
+        const out = await callModel(buildSystemBlocks(), user, FIX_SCHEMA, { simple: true });
         return out.text;
       }
 
@@ -3277,9 +3276,7 @@
               `Дополнительный запрос пользователя: ${clipText(text, 500)}`,
               `Соседние тексты на экране: ${neighbourContext()}`,
               `Нужно сгенерировать ${state.settings.variantsCount} вариантов.`,
-              "Верни JSON формата {variants:[{text,score,reason,tags:[]}]}.",
-              "score от 0 до 10 по соответствию редполитике.",
-              "reason — короткое пояснение тона варианта.",
+              "Верни JSON формата {variants:[{text}]}.",
             ]
               .filter(Boolean)
               .join("\n");
@@ -3325,9 +3322,7 @@
               `Дополнительный запрос пользователя: ${clipText(text, 500)}`,
               `Соседние тексты на экране: ${frameContext(idx)}`,
               `Нужно сгенерировать ${state.settings.variantsCount} вариантов.`,
-              "Верни JSON формата {variants:[{text,score,reason,tags:[]}]}.",
-              "score от 0 до 10 по соответствию редполитике.",
-              "reason — короткое пояснение тона варианта.",
+              "Верни JSON формата {variants:[{text}]}.",
             ]
               .filter(Boolean)
               .join("\n");
@@ -3494,9 +3489,7 @@
               `Текст: ${clipText(state.selectionText, 2000)}`,
               `Соседние тексты на экране: ${neighbourContext()}`,
               `Нужно сгенерировать ${state.settings.variantsCount} вариантов.`,
-              "Верни JSON формата {variants:[{text,score,reason,tags:[]}]}.",
-              "score от 0 до 10 по соответствию редполитике.",
-              "reason — короткое пояснение тона варианта.",
+              "Верни JSON формата {variants:[{text}]}.",
             ].join("\n");
             const out = await callModel(buildSystemBlocks(), user, VARIANTS_SCHEMA);
             next = Array.isArray(out.variants) ? out.variants : [];
@@ -3539,9 +3532,10 @@
             task,
             `Соседние тексты на экране: ${neighbourContext()}`,
             "Верни JSON формата:",
-            "{score:number,summary:string,tags:string[],recommendations:string[],issues:[{fragment,problem,recommendation,severity}]}",
-            "tags: короткие ярлыки замечаний (Скобки, Парцелляция, Капс и т.п.).",
-            "recommendations: 2-5 конкретных советов, как исправить текст.",
+            "{score:number,issues:[{fragment,problem,recommendation,severity}]}",
+            "problem: короткий ярлык замечания (Скобки, Парцелляция, Капс и т.п.).",
+            "issues: не больше 5 самых важных замечаний.",
+            "recommendation в каждом замечании — конкретный совет, как исправить фрагмент.",
             "score от 0 до 10 — это оценка модели по редполитике.",
           ].join("\n");
           state.checkResult = {
@@ -3695,9 +3689,7 @@
               `Текст: ${clipText(block.text, 2000)}`,
               `Остальные тексты этого экрана (контекст):\n${frameContext(idx)}`,
               `Нужно сгенерировать ${state.settings.variantsCount} вариантов.`,
-              "Верни JSON формата {variants:[{text,score,reason,tags:[]}]}.",
-              "score от 0 до 10 по соответствию редполитике.",
-              "reason — короткое пояснение тона варианта.",
+              "Верни JSON формата {variants:[{text}]}.",
             ].join("\n");
             const out = await callModel(buildSystemBlocks(), user, VARIANTS_SCHEMA);
             next = Array.isArray(out.variants) ? out.variants : [];
@@ -3811,7 +3803,6 @@
           )
           .join("\n\n---\n\n");
         const adapter = `Ты UX-редактор Контура внутри Figma-плагина. Применяй инструкции скилла ниже.
-Текущая операция: ${task === "variants" ? "варианты правки выбранного фрагмента" : "проверка текста"}.
 Режим и операция уже выбраны в интерфейсе: не задавай уточняющих вопросов и не переключай режим.
 Для фрейма применяй инструкции к каждому текстовому блоку с учётом всего экрана.
 Технический формат ответа имеет приоритет над оформлением из скилла: верни только JSON по схеме из запроса, без Markdown и текста вне JSON. Заполни все поля схемы, включая score 0–10, даже если скилл не требует оценки. Для проверки верни замечания, для генерации — запрошенное число вариантов.
@@ -3822,9 +3813,19 @@
 ${skill.instructions}
 
 # База знаний
-${references}
-${state.settings.manualRulesText ? `Дополнительные правила:\n${clipText(state.settings.manualRulesText, 8000)}` : ""}`;
-        return [{ type: "text", text, cache_control: { type: "ephemeral", ttl: "1h" } }];
+${references}`;
+        const tail = [
+          `Текущая операция: ${task === "variants" ? "варианты правки выбранного фрагмента" : "проверка текста"}.`,
+          state.settings.manualRulesText
+            ? `Дополнительные правила:\n${clipText(state.settings.manualRulesText, 8000)}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n\n");
+        return [
+          { type: "text", text, cache_control: { type: "ephemeral", ttl: "1h" } },
+          { type: "text", text: tail },
+        ];
       }
 
       function neighbourContext() {
